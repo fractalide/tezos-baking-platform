@@ -2,8 +2,25 @@
 
 rec {
     o = pkgs.ocamlPackages_latest;
-    lib = pkgs.lib;
+    inherit (pkgs) lib;
     opam2nix = pkgs.callPackage ./opam2nix-packages.nix { inherit pkgs; };
+
+    addBuildInputs = p: buildInputs: lib.overrideDerivation p (attrs: {
+      buildInputs = (attrs.buildInputs or []) ++ buildInputs;
+    });
+
+    opamSolution = opam2nix.buildOpamPackages {
+      packagesParsed = [
+        {
+          packageName = "irmin-leveldb";
+          version = "0.0.0";
+          src = vendors/irmin-leveldb;
+        }
+      ];
+      userOverrides = { self, super }: {
+        leveldb = addBuildInputs super.leveldb [pkgs.snappy];
+      };
+    };
     #tezos-node = opam2nix.buildOpamPackage rec {
     #  name = "tezos-node";
     #  version = "0.0.0";
@@ -26,20 +43,10 @@ rec {
     #  src = src/lib_storage;
     #  extraPackages = ["irmin-leveldb"];
     #};
-    addInputs = p: inps: lib.overrideDerivation p (attrs: {
-      buildInputs = attrs.buildInputs ++ inps;
-    });
-    leveldb = addInputs irmin-leveldb.opamSelection.leveldb [pkgs.snappy]; 
-    irmin-leveldb = opam2nix.buildOpamPackage {
-      name = "irmin-leveldb";
-      version = "0.0.0";
-      src = vendors/irmin-leveldb;
-      extraPackages = [leveldb];
-    };
     final = pkgs.stdenv.mkDerivation {
       name = "tezos";
       src = ./.;
-      buildInputs = with o;
+      buildInputs = with opamSolution.packageSet;
         [ocaml
          findlib
          irmin-leveldb
