@@ -9,6 +9,12 @@ rec {
     buildInputs = (attrs.buildInputs or []) ++ buildInputs;
   });
   
+  onOpamSelection = f: { self, super }:
+    { 
+      opamSelection = super.opamSelection //
+        f { self = self.opamSelection; super = super.opamSelection; };
+    }; 
+
   opamSolution = opam2nix.buildOpamPackages {
     packagesParsed = [
       {
@@ -16,40 +22,55 @@ rec {
         version = "0.0.0";
         src = vendors/irmin-leveldb;
       }
+      {
+        packageName = "tezos-node";
+        version = "0.0.0";
+        src = src/bin_node;
+      }
+      {
+        packageName = "tezos-embedded-protocol-alpha";
+        version = "0.0.0";
+        src = src/proto_alpha/lib_protocol;
+        opamFile = src/proto_alpha/lib_protocol/tezos-embedded-protocol-alpha.opam;
+      }
+      {
+        packageName = "tezos-protocol-compiler";
+        version = "0.0.0";
+        src = src/lib_protocol_compiler;
+      }
+      {
+        packageName = "tezos-protocol-updater";
+        version = "0.0.0";
+        src = src/lib_protocol_updater;
+      }
+      {
+        packageName = "tezos-storage";
+        version = "0.0.0";
+        src = src/lib_storage;
+      }
+      {
+        packageName = "tezos-stdlib-unix";
+        version = "0.0.0";
+        src = src/lib_stdlib_unix;
+      }
+      {
+        packageName = "tezos-embedded-protocol-demo";
+        version = "0.0.0";
+        src = src/proto_demo/lib_protocol;
+        opamFile = src/proto_demo/lib_protocol/tezos-embedded-protocol-demo.opam;
+      }
     ];
-    userOverrides = { self, super }: {
-      leveldb = addBuildInputs super.leveldb [pkgs.snappy];
-    };
+    overrides = onOpamSelection ({ self, super }: {
+      leveldb = addBuildInputs super.opamSelection.leveldb [pkgs.snappy];
+    });
   };
-  #tezos-node = opam2nix.buildOpamPackage rec {
-  #  name = "tezos-node";
-  #  version = "0.0.0";
-  #  src = src/bin_node;
-  #};
-  #tezos-embedded-protocol-alpha = opam2nix.buildOpamPackage rec {
-  #  name = "tezos-embedded-protocol-alpha";
-  #  version = "0.0.0";
-  #  src = src/proto_alpha/lib_protocol;
-  #  opamFile = src/proto_alpha/lib_protocol/tezos-embedded-protocol-alpha.opam;
-  #};
-  #tezos-protocol-updater = opam2nix.buildOpamPackage rec {
-  #  name = "tezos-protocol-updater";
-  #  version = "0.0.0";
-  #  src = src/lib_protocol_updater;
-  #};
-  #tezos-storage = opam2nix.buildOpamPackage rec {
-  #  name = "tezos-storage";
-  #  version = "0.0.0";
-  #  src = src/lib_storage;
-  #  extraPackages = ["irmin-leveldb"];
-  #};
   final = pkgs.stdenv.mkDerivation {
     name = "tezos";
     src = ./.;
     buildInputs = with opamSolution.packageSet; [
       ocaml
-      findlib
-      irmin-leveldb
+      o.findlib
+      tezos-node
     ];
   };
 }
