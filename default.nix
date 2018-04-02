@@ -21,6 +21,26 @@ rec {
     specs = [{ name = "jbuilder"; constraint = "=1.0+beta19"; } ];
     packagesParsed = [
       {
+        packageName = "ocplib-resto-cohttp";
+        version = "0.0.0";
+        src = vendors/ocplib-resto/lib_resto-cohttp;
+      }
+      {
+        packageName = "ocplib-resto-directory";
+        version = "dev";
+        src = vendors/ocplib-resto/lib_resto-directory;
+      }
+      {
+        packageName = "tweetnacl";
+        version = "dev";
+        src = vendors/ocaml-tweetnacl;
+      }
+      {
+        packageName = "blake2";
+        version = "dev";
+        src = vendors/ocaml-blake2;
+      }
+      {
         packageName = "irmin-leveldb";
         version = "0.0.0";
         src = vendors/irmin-leveldb;
@@ -68,14 +88,60 @@ rec {
         src = src/lib_base;
       }
       {
+        packageName = "tezos-crypto";
+        version = "0.0.0";
+        src = src/lib_crypto;
+      }
+      {
+        packageName = "tezos-stdlib";
+        version = "0.0.0";
+        src = src/lib_stdlib;
+      }
+      {
         packageName = "tezos-shell";
         version = "0.0.0";
         src = src/lib_shell;
       }
       {
+        packageName = "tezos-shell-services";
+        version = "0.0.0";
+        src = src/lib_shell_services;
+      }
+      {
+        packageName = "tezos-micheline";
+        version = "0.0.0";
+        src = src/lib_micheline;
+      }
+      {
+        packageName = "tezos-error-monad";
+        version = "0.0.0";
+        src = src/lib_error_monad;
+      }
+      {
+        packageName = "tezos-data-encoding";
+        version = "0.0.0";
+        src = src/lib_data_encoding;
+      }
+      {
+        packageName = "tezos-rpc";
+        version = "0.0.0";
+        src = src/lib_rpc;
+      }
+      {
+        packageName = "tezos-rpc-http";
+        version = "0.0.0";
+        src = src/lib_rpc_http;
+      }
+      {
         packageName = "tezos-p2p";
         version = "0.0.0";
         src = src/lib_p2p;
+      }
+      {
+        packageName = "tezos-protocol-environment";
+        version = "0.0.0";
+        src = src/lib_protocol_environment;
+        opamFile = src/lib_protocol_environment/tezos-protocol-environment.opam;
       }
       {
         packageName = "tezos-protocol-environment-shell";
@@ -95,9 +161,15 @@ rec {
         src = src/proto_genesis/lib_protocol;
         opamFile = src/proto_genesis/lib_protocol/tezos-embedded-protocol-genesis.opam;
       }
+      {
+        packageName = "tezos-protocol-environment-sigs";
+        version = "0.0.0";
+        src = src/lib_protocol_environment;
+        opamFile = src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
+      }
     ];
     overrides = onOpamSelection ({ self, super }: {
-      leveldb = addBuildInputs super.opamSelection.leveldb [pkgs.snappy];
+      leveldb = addBuildInputs super.leveldb [pkgs.snappy];
     });
   };
   final = pkgs.stdenv.mkDerivation {
