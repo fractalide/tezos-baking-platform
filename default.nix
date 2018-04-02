@@ -2,6 +2,7 @@
 
 rec {
   o = pkgs.ocamlPackages_latest;
+  inherit pkgs;
   inherit (pkgs) lib;
   opam2nix = pkgs.callPackage ./opam2nix-packages.nix { inherit pkgs; };
   
@@ -16,6 +17,8 @@ rec {
     }; 
 
   opamSolution = opam2nix.buildOpamPackages {
+    ocamlAttr = "ocamlPackages_latest.ocaml";
+    specs = [{ name = "jbuilder"; constraint = "=1.0+beta19"; } ];
     packagesParsed = [
       {
         packageName = "irmin-leveldb";
@@ -58,6 +61,39 @@ rec {
         version = "0.0.0";
         src = src/proto_demo/lib_protocol;
         opamFile = src/proto_demo/lib_protocol/tezos-embedded-protocol-demo.opam;
+      }
+      {
+        packageName = "tezos-base";
+        version = "0.0.0";
+        src = src/lib_base;
+      }
+      {
+        packageName = "tezos-shell";
+        version = "0.0.0";
+        src = src/lib_shell;
+      }
+      {
+        packageName = "tezos-p2p";
+        version = "0.0.0";
+        src = src/lib_p2p;
+      }
+      {
+        packageName = "tezos-protocol-environment-shell";
+        version = "0.0.0";
+        src = src/lib_protocol_environment;
+        opamFile = src/lib_protocol_environment/tezos-protocol-environment-shell.opam;
+      }
+      {
+        packageName = "tezos-protocol-genesis";
+        version = "0.0.0";
+        src = src/proto_genesis/lib_protocol;
+        opamFile = src/proto_genesis/lib_protocol/tezos-protocol-genesis.opam;
+      }
+      {
+        packageName = "tezos-embedded-protocol-genesis";
+        version = "0.0.0";
+        src = src/proto_genesis/lib_protocol;
+        opamFile = src/proto_genesis/lib_protocol/tezos-embedded-protocol-genesis.opam;
       }
     ];
     overrides = onOpamSelection ({ self, super }: {
