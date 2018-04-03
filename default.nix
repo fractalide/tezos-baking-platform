@@ -1,4 +1,8 @@
-{ pkgs ? import <nixos-next-stable> {} }:
+{ pkgs ? import (builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/b6ddb9913f2.tar.gz";
+    sha256 = "1yjbd5jhjgirv7ki0sms1x13dqyjzg0rpb7n67m6ik61fmpq0nfw";
+  }) {}
+}:
 
 rec {
   o = pkgs.ocamlPackages_latest;
