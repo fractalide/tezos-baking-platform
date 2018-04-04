@@ -12,7 +12,13 @@ rec {
   addBuildInputs = p: buildInputs: lib.overrideDerivation p (attrs: {
     buildInputs = (attrs.buildInputs or []) ++ buildInputs;
   });
-  fauxpam = pkgs.writeScript "opam" "echo";
+  fauxpam = pkgs.runCommand "fauxpam" {} ''
+    mkdir -p "$out/bin"
+    cat >"$out/bin/opam" <<'EOF'
+    #!/bin/sh
+    echo "$@"
+    EOF
+  '';
   onOpamSelection = f: { self, super }:
     { 
       opamSelection = super.opamSelection //
