@@ -9,11 +9,10 @@ rec {
   inherit pkgs;
   inherit (pkgs) lib;
   opam2nix = pkgs.callPackage ./opam2nix-packages.nix { inherit pkgs; };
-  
   addBuildInputs = p: buildInputs: lib.overrideDerivation p (attrs: {
     buildInputs = (attrs.buildInputs or []) ++ buildInputs;
   });
-  
+  fauxpam = pkgs.writeScript "opam" "echo";
   onOpamSelection = f: { self, super }:
     { 
       opamSelection = super.opamSelection //
@@ -22,7 +21,10 @@ rec {
 
   opamSolution = opam2nix.buildOpamPackages {
     ocamlAttr = "ocamlPackages_latest.ocaml";
-    specs = [{ name = "jbuilder"; constraint = "=1.0+beta19"; } ];
+    specs = [
+      { name = "jbuilder"; constraint = "=1.0+beta19"; }
+      { name = "ocb-stubblr"; }
+    ];
     packagesParsed = [
       {
         packageName = "ocplib-resto-cohttp";
@@ -174,6 +176,9 @@ rec {
     ];
     overrides = onOpamSelection ({ self, super }: {
       leveldb = addBuildInputs super.leveldb [pkgs.snappy];
+      ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [super.jbuilder super.lwt];
+      cpuid = addBuildInputs super.cpuid [ fauxpam ];
+      ocaml-migrate-parsetree = addBuildInputs super.ocaml-migrate-parsetree [super.result];
     });
   };
   final = pkgs.stdenv.mkDerivation {
