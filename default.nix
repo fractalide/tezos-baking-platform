@@ -9,16 +9,20 @@ rec {
   inherit pkgs;
   inherit (pkgs) lib;
   opam2nix = pkgs.callPackage ./opam2nix-packages.nix { inherit pkgs; };
+
   addBuildInputs = p: buildInputs: lib.overrideDerivation p (attrs: {
     buildInputs = (attrs.buildInputs or []) ++ buildInputs;
   });
+
   fauxpam = pkgs.runCommand "fauxpam" {} ''
     mkdir -p "$out/bin"
     cat >"$out/bin/opam" <<'EOF'
     #!/bin/sh
     echo "$@"
     EOF
-  '';
+    chmod +x "$out/bin/opam"
+  ''; # (extremely) fake opam executable that packages can use when requesting certain opam configs that may be blank
+
   onOpamSelection = f: { self, super }:
     { 
       opamSelection = super.opamSelection //
@@ -30,6 +34,7 @@ rec {
     specs = [
       { name = "jbuilder"; constraint = "=1.0+beta19"; }
       { name = "ocb-stubblr"; }
+      { name = "cpuid"; }
     ];
     packagesParsed = [
       {
@@ -184,7 +189,6 @@ rec {
       leveldb = addBuildInputs super.leveldb [pkgs.snappy];
       ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [super.jbuilder super.lwt];
       cpuid = addBuildInputs super.cpuid [ fauxpam ];
-      ocaml-migrate-parsetree = addBuildInputs super.ocaml-migrate-parsetree [super.result];
     });
   };
   final = pkgs.stdenv.mkDerivation {
