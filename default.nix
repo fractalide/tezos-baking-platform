@@ -32,11 +32,16 @@ rec {
   opamSolution = opam2nix.buildOpamPackages {
     ocamlAttr = "ocamlPackages_latest.ocaml";
     specs = [
-      { name = "jbuilder"; constraint = "=1.0+beta19"; }
+      { name = "jbuilder"; constraint = "=1.0+beta19.1"; }
       { name = "ocb-stubblr"; }
       { name = "cpuid"; }
     ];
     packagesParsed = [
+      {
+        packageName = "ocplib-resto";
+        version = "dev";
+        src = vendors/ocplib-resto/lib_resto;
+      }
       {
         packageName = "ocplib-resto-cohttp";
         version = "0.0.0";
@@ -184,11 +189,15 @@ rec {
         src = src/lib_protocol_environment;
         opamFile = src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
       }
+
     ];
     overrides = onOpamSelection ({ self, super }: {
       leveldb = addBuildInputs super.leveldb [pkgs.snappy];
-      ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [super.jbuilder super.lwt];
+      ocplib-resto-cohttp = addBuildInputs super.ocplib-resto-cohttp [super.jbuilder super.lwt super.ocplib-resto self.ocplib-resto-directory];
+      ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [super.jbuilder super.lwt super.ocplib-resto];
+      tezos-rpc-http = addBuildInputs super.tezos-rpc-http [self.ocplib-resto-cohttp];
       cpuid = addBuildInputs super.cpuid [ fauxpam ];
+      nocrypto = addBuildInputs super.nocrypto [ fauxpam ];
     });
   };
   final = pkgs.stdenv.mkDerivation {
