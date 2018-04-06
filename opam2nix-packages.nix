@@ -7,10 +7,10 @@ let
 	devRepo = builtins.getEnv "OPAM2NIX_DEVEL";
 	src = ./opam2nix-packages;
 	opam2nix = fetchgit 	{
-		"url" = "https://github.com/timbertson/opam2nix.git";
+		"url" = "https://github.com/obsidiansystems/opam2nix.git";
 		"fetchSubmodules" = false;
-		"sha256" = "1vj2pjwfil7h8czbrknfq6py33p5cz12cyfxj8yq190lmwcimhcb";
-		"rev" = "790acd3b949540aa4b1e1cf580a03e36f52ae75b";
+		"sha256" = "1l941zq4qrspqg9zl3j5k6lp161iha1ifky5r1576gz4a2cfplk0";
+		"rev" = "9c593cdbcf45192639d3d647cbd887622780d9a2";
 	};
 in
 if devRepo != "" then

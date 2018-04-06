@@ -192,21 +192,31 @@ rec {
 
     ];
     overrides = onOpamSelection ({ self, super }: {
-      leveldb = addBuildInputs super.leveldb [pkgs.snappy];
+      leveldb = addBuildInputs super.leveldb [ pkgs.snappy ];
       ocplib-resto-cohttp = addBuildInputs super.ocplib-resto-cohttp [super.jbuilder super.lwt super.ocplib-resto self.ocplib-resto-directory];
       ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [super.jbuilder super.lwt super.ocplib-resto];
       tezos-rpc-http = addBuildInputs super.tezos-rpc-http [self.ocplib-resto-cohttp];
       cpuid = addBuildInputs super.cpuid [ fauxpam ];
       nocrypto = addBuildInputs super.nocrypto [ fauxpam ];
+      tezos-node = addBuildInputs super.tezos-node [ pkgs.snappy ];
     });
   };
+  node = opamSolution.packageSet.tezos-node;
   final = pkgs.stdenv.mkDerivation {
     name = "tezos";
     src = ./.;
-    buildInputs = with opamSolution.packageSet; [
-      ocaml
-      o.findlib
+    buildInputs = (with opamSolution.packageSet; [
       tezos-node
-    ];
+    ]) ++ (with pkgs; [
+      snappy
+      opam
+      stdenv
+      m4
+      gmp
+      leveldb
+      pkgconfig
+      openssl
+      omake
+    ]);
   };
 }
