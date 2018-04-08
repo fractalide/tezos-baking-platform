@@ -38,6 +38,11 @@ rec {
     ];
     packagesParsed = [
       {
+        packageName = "bip39";
+        version = "dev";
+        src = vendors/ocaml-bip39;
+      }
+      {
         packageName = "ocplib-resto";
         version = "dev";
         src = vendors/ocplib-resto/lib_resto;
@@ -66,6 +71,59 @@ rec {
         packageName = "irmin-leveldb";
         version = "0.0.0";
         src = vendors/irmin-leveldb;
+      }
+      {
+        packageName = "tezos-client";
+        version = "0.0.0";
+        src = src/bin_client;
+      }
+      {
+        packageName = "tezos-client-base";
+        version = "0.0.0";
+        src = src/lib_client_base;
+      }
+      {
+        packageName = "tezos-client-base-unix";
+        version = "0.0.0";
+        src = src/lib_client_base_unix;
+      }
+      {
+        packageName = "tezos-protocol-alpha";
+        version = "0.0.0";
+        src = src/proto_alpha/lib_protocol;
+        opamFile = src/proto_alpha/lib_protocol/tezos-protocol-alpha.opam;
+      }
+      {
+        packageName = "tezos-baking-alpha-commands";
+        version = "0.0.0";
+        src = src/proto_alpha/lib_baking;
+        opamFile = src/proto_alpha/lib_baking/tezos-baking-alpha-commands.opam;
+      }
+      {
+        packageName = "tezos-baking-alpha";
+        version = "0.0.0";
+        src = src/proto_alpha/lib_baking;
+        opamFile = src/proto_alpha/lib_baking/tezos-baking-alpha.opam;
+      }
+      {
+        packageName = "tezos-client-alpha";
+        version = "0.0.0";
+        src = src/proto_alpha/lib_client;
+      }
+      {
+        packageName = "tezos-client-alpha-commands";
+        version = "0.0.0";
+        src = src/proto_alpha/lib_client_commands;
+      }
+      {
+        packageName = "tezos-client-commands";
+        version = "0.0.0";
+        src = src/lib_client_commands;
+      }
+      {
+        packageName = "tezos-client-genesis";
+        version = "0.0.0";
+        src = src/proto_genesis/lib_client;
       }
       {
         packageName = "tezos-node";
@@ -202,6 +260,7 @@ rec {
     });
   };
   node = opamSolution.packageSet.tezos-node;
+  client = opamSolution.packageSet.tezos-client;
   final = pkgs.stdenv.mkDerivation {
     name = "tezos";
     src = ./.;
