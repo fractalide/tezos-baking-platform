@@ -260,8 +260,8 @@ rec {
     ];
     overrides = onOpamSelection ({ self, super }: {
       leveldb = addBuildInputs super.leveldb [ pkgs.snappy ];
-      ocplib-resto-cohttp = addBuildInputs super.ocplib-resto-cohttp [super.jbuilder super.lwt super.ocplib-resto self.ocplib-resto-directory];
-      ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [super.jbuilder super.lwt super.ocplib-resto];
+      ocplib-resto-cohttp = addBuildInputs super.ocplib-resto-cohttp [self.jbuilder self.lwt self.ocplib-resto self.ocplib-resto-directory];
+      ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [self.jbuilder self.lwt self.ocplib-resto];
       tezos-rpc-http = addBuildInputs super.tezos-rpc-http [self.ocplib-resto-cohttp];
       cpuid = addBuildInputs super.cpuid [ fauxpam ];
       nocrypto = addBuildInputs super.nocrypto [ fauxpam ];
