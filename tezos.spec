@@ -46,9 +46,9 @@ sed -i '1s@#![[:space:]]*/nix/store/[^/]*/bin@%{_bindir}@' ./tezos-sandboxed-nod
 # head ./tezos-sandboxed-node.sh
 
 %install
-mkdir -p ${RPM_BUILD_ROOT}/opt/tezos
-cp -p %{_builddir}/tezos/tezos-node ${RPM_BUILD_ROOT}/opt/tezos/tezos-node
-cp -p %{_builddir}/tezos/tezos-sandboxed-node.sh ${RPM_BUILD_ROOT}/opt/tezos/tezos-sandboxed-node.sh
+mkdir -p ${RPM_BUILD_ROOT}/opt/tezos/bin
+cp -p %{_builddir}/tezos/tezos-node ${RPM_BUILD_ROOT}/opt/tezos/bin/tezos-node
+cp -p %{_builddir}/tezos/tezos-sandboxed-node.sh ${RPM_BUILD_ROOT}/opt/tezos/bin/tezos-sandboxed-node.sh
 
 %files
 

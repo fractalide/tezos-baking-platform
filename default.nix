@@ -311,5 +311,10 @@ rec {
         "bash" # rpmbuild is smart enough to notice we have installed files with shebangs
       ];
     };
+
+    # check to make sure we have a working package... show the first few lines of the built in help
+    postRPMInstall = ''
+      /opt/tezos/bin/tezos-node --help=plain | head
+    '';
   };
 }
