@@ -289,7 +289,8 @@ rec {
   };
 
 
-  tezos-node-rpm = pkgs.vmTools.buildRPM {
+  # pkgs.vmTools.buildRPM just builds, rpmBuild also installs
+  tezos-node-rpm = pkgs.releaseTools.rpmBuild {
     name = "tezos-node-rpm";
     src = pkgs.runCommand "tezos-prebuilt.tar" {} ''
       mkdir -p tarball/tezos
@@ -298,14 +299,17 @@ rec {
       cp ${node}/bin/tezos-sandboxed-node.sh tarball/tezos/tezos-sandboxed-node.sh
       tar -cf $out tezos.spec
       tar --transform='s#tarball/##' -rf $out tarball/tezos
-      # echo $out
-      # tar -tf $out
-      # exit 1
     '';
 
     diskImage = pkgs.vmTools.diskImageFuns.fedora27x86_64 {
-      extraPackages = ["patchelf"];
+      extraPackages = [
+        # for pkgs.vmTools.buildRPM, this is enough; but we need the install requirements too to check
+        # BuildRequires
+        "patchelf"
+        # Requires
+        "leveldb" "snappy"
+        "bash" # rpmbuild is smart enough to notice we have installed files with shebangs
+      ];
     };
   };
-
 }

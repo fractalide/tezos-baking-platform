@@ -11,8 +11,6 @@ URL:		https://www.tezos.com/
 ExclusiveArch: x86_64
 
 Source0: ./tezos-prebuilt.tar
-# Source1: tezos-node
-# Source2: tezos-sandboxed-node.sh
 
 BuildRequires: patchelf
 
@@ -31,26 +29,21 @@ Requires: leveldb
 %build
 %prep
 %setup -n tezos
-# mkdir -p %{_builddir}
-find .
-# cp -p %{SOURCE1} ./tezos-node
-# cp -p %{SOURCE2} ./tezos-sandboxed-node.sh
-
-pwd
 
 # nix built stuff is "immutable"
 chmod 755 ./tezos-node
 
-
- # $(basename $(rpm -ql compat-openssl10 | grep '/usr/lib64/libssl.so.1.0'))
-
 patchelf --set-rpath "%{_libdir}" \
          --replace-needed libssl.so.1.0.0 libssl.so.10 \
          --replace-needed libcrypto.so.1.0.0 libcrypto.so.10 \
-         --set-interpreter "$(patchelf --print-interpreter "%{_ld}")" \
+         --set-interpreter "$(patchelf --print-interpreter "%{__ld}")" \
          ./tezos-node
 
-ldd ./tezos-node
+# patchbash?
+sed -i '1s@#![[:space:]]*/nix/store/[^/]*/bin@%{_bindir}@' ./tezos-sandboxed-node.sh
+
+# ldd ./tezos-node
+# head ./tezos-sandboxed-node.sh
 
 %install
 mkdir -p ${RPM_BUILD_ROOT}/opt/tezos
