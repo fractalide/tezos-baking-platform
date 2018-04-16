@@ -287,4 +287,25 @@ rec {
       omake
     ]);
   };
+
+
+  tezos-node-rpm = pkgs.vmTools.buildRPM {
+    name = "tezos-node-rpm";
+    src = pkgs.runCommand "tezos-prebuilt.tar" {} ''
+      mkdir -p tarball/tezos
+      cp ${./tezos.spec} tezos.spec
+      cp ${node}/bin/tezos-node tarball/tezos/tezos-node
+      cp ${node}/bin/tezos-sandboxed-node.sh tarball/tezos/tezos-sandboxed-node.sh
+      tar -cf $out tezos.spec
+      tar --transform='s#tarball/##' -rf $out tarball/tezos
+      # echo $out
+      # tar -tf $out
+      # exit 1
+    '';
+
+    diskImage = pkgs.vmTools.diskImageFuns.fedora27x86_64 {
+      extraPackages = ["patchelf"];
+    };
+  };
+
 }
