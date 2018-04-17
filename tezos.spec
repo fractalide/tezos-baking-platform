@@ -32,12 +32,25 @@ Requires: leveldb
 
 # nix built stuff is "immutable"
 chmod 755 ./tezos-node
-
 patchelf --set-rpath "%{_libdir}" \
          --replace-needed libssl.so.1.0.0 libssl.so.10 \
          --replace-needed libcrypto.so.1.0.0 libcrypto.so.10 \
          --set-interpreter "$(patchelf --print-interpreter "%{__ld}")" \
          ./tezos-node
+
+chmod 755 ./tezos-client
+patchelf --set-rpath "%{_libdir}" \
+         --replace-needed libssl.so.1.0.0 libssl.so.10 \
+         --replace-needed libcrypto.so.1.0.0 libcrypto.so.10 \
+         --set-interpreter "$(patchelf --print-interpreter "%{__ld}")" \
+         ./tezos-client
+
+chmod 755 ./tezos-admin-client
+patchelf --set-rpath "%{_libdir}" \
+         --replace-needed libssl.so.1.0.0 libssl.so.10 \
+         --replace-needed libcrypto.so.1.0.0 libcrypto.so.10 \
+         --set-interpreter "$(patchelf --print-interpreter "%{__ld}")" \
+         ./tezos-admin-client
 
 # patchbash?
 sed -i '1s@#![[:space:]]*/nix/store/[^/]*/bin@%{_bindir}@' ./tezos-sandboxed-node.sh
@@ -48,6 +61,8 @@ sed -i '1s@#![[:space:]]*/nix/store/[^/]*/bin@%{_bindir}@' ./tezos-sandboxed-nod
 %install
 mkdir -p ${RPM_BUILD_ROOT}/opt/tezos/bin
 cp -p %{_builddir}/tezos/tezos-node ${RPM_BUILD_ROOT}/opt/tezos/bin/tezos-node
+cp -p %{_builddir}/tezos/tezos-client ${RPM_BUILD_ROOT}/opt/tezos/bin/tezos-client
+cp -p %{_builddir}/tezos/tezos-admin-client ${RPM_BUILD_ROOT}/opt/tezos/bin/tezos-admin-client
 cp -p %{_builddir}/tezos/tezos-sandboxed-node.sh ${RPM_BUILD_ROOT}/opt/tezos/bin/tezos-sandboxed-node.sh
 
 %files
