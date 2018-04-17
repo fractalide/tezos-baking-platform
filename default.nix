@@ -270,33 +270,19 @@ rec {
   };
   node = opamSolution.packageSet.tezos-node;
   client = opamSolution.packageSet.tezos-client;
-  final = pkgs.stdenv.mkDerivation {
-    name = "tezos";
-    src = ./.;
-    buildInputs = (with opamSolution.packageSet; [
-      tezos-node
-    ]) ++ (with pkgs; [
-      snappy
-      opam
-      stdenv
-      m4
-      gmp
-      leveldb
-      pkgconfig
-      openssl
-      omake
-    ]);
-  };
-
 
   # pkgs.vmTools.buildRPM just builds, rpmBuild also installs
-  tezos-node-rpm = pkgs.releaseTools.rpmBuild {
+  tezos-rpm = pkgs.releaseTools.rpmBuild {
     name = "tezos-node-rpm";
     src = pkgs.runCommand "tezos-prebuilt.tar" {} ''
       mkdir -p tarball/tezos
       cp ${./tezos.spec} tezos.spec
       cp ${node}/bin/tezos-node tarball/tezos/tezos-node
       cp ${node}/bin/tezos-sandboxed-node.sh tarball/tezos/tezos-sandboxed-node.sh
+      cp ${client}/bin/tezos-client tarball/tezos/tezos-client
+      cp ${client}/bin/tezos-admin-client tarball/tezos/tezos-admin-client
+      cp ${client}/bin/tezos-init-sandboxed-client.sh tarball/tezos/tezos-init-sandboxed-client.sh
+
       tar -cf $out tezos.spec
       tar --transform='s#tarball/##' -rf $out tarball/tezos
     '';
@@ -316,5 +302,41 @@ rec {
     postRPMInstall = ''
       /opt/tezos/bin/tezos-node --help=plain | head
     '';
+  };
+
+  tezos-deb = pkgs.releaseTools.debBuild {
+    name = "tezos-node-deb";
+
+    src = pkgs.runCommand "tezos-prebuilt.tar" {} ''
+      mkdir -p tarball/tezos
+      function patchbinary {
+        patchelf --set-interpreter /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 --set-rpath /lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/ $1
+      }
+      cat > tarball/tezos/Makefile <<EOF
+      install:
+      ''\tinstall tezos-node tezos-client tezos-admin-client tezos-sandboxed-node.sh tezos-init-sandboxed-client.sh /usr/bin
+      check:
+      EOF
+      cp ${node}/bin/tezos-node tarball/tezos/tezos-node
+      cp ${node}/bin/tezos-sandboxed-node.sh tarball/tezos/tezos-sandboxed-node.sh
+      cp ${client}/bin/tezos-client tarball/tezos/tezos-client
+      cp ${client}/bin/tezos-admin-client tarball/tezos/tezos-admin-client
+      cp ${client}/bin/tezos-init-sandboxed-client.sh tarball/tezos/tezos-init-sandboxed-client.sh
+      patchelf tarball/tezos/tezos-node
+      patchelf tarball/tezos/tezos-client
+      patchelf tarball/tezos/tezos-admin-client
+      tar --transform='s#tarball/##' -rf $out tarball/tezos
+    '';
+
+    debRequires = ["libleveldb1v5" "libsnappy1v5"];
+
+    diskImage = pkgs.vmTools.diskImageFuns.ubuntu1710x86_64 {
+      extraPackages = [
+        # BuildRequires
+        "patchelf"
+        # Requires
+        "bash" "libleveldb1v5" "libsnappy1v5"
+      ];
+    };
   };
 }
