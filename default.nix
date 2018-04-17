@@ -82,6 +82,16 @@ rec {
         src = vendors/irmin-leveldb;
       }
       {
+        packageName = "secp256k1-internal";
+        version = "0.1";
+        src = vendors/ocaml-secp256k1-internal;
+      }
+      {
+        packageName = "tezos-clic";
+        version = "0.0.0";
+        src = src/lib_clic;
+      }
+      {
         packageName = "tezos-client";
         version = "0.0.0";
         src = src/bin_client;
