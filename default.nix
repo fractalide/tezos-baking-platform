@@ -266,7 +266,11 @@ rec {
         src = src/lib_protocol_environment;
         opamFile = src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
       }
-
+      {
+        packageName = "tezos-baker-alpha";
+        version = "0.0.0";
+        src = src/proto_alpha/bin_baker;
+      }
     ];
     overrides = onOpamSelection ({ self, super }: {
       leveldb = addBuildInputs super.leveldb [ pkgs.snappy ];
@@ -280,6 +284,7 @@ rec {
   };
   node = opamSolution.packageSet.tezos-node;
   client = opamSolution.packageSet.tezos-client;
+  baker-alpha = opamSolution.packageSet.tezos-baker-alpha;
 
   # pkgs.vmTools.buildRPM just builds, rpmBuild also installs
   tezos-rpm = pkgs.releaseTools.rpmBuild {
@@ -292,6 +297,7 @@ rec {
       cp ${client}/bin/tezos-client tarball/tezos/tezos-client
       cp ${client}/bin/tezos-admin-client tarball/tezos/tezos-admin-client
       cp ${client}/bin/tezos-init-sandboxed-client.sh tarball/tezos/tezos-init-sandboxed-client.sh
+      cp ${baker-alpha}/bin/tezos-baker-alpha tarball/tezos/tezos-baker-alpha
 
       tar -cf $out tezos.spec
       tar --transform='s#tarball/##' -rf $out tarball/tezos
@@ -324,7 +330,7 @@ rec {
       }
       cat > tarball/tezos/Makefile <<EOF
       install:
-      ''\tinstall tezos-node tezos-client tezos-admin-client tezos-sandboxed-node.sh tezos-init-sandboxed-client.sh /usr/bin
+      ''\tinstall tezos-node tezos-client tezos-admin-client tezos-baker-alpha tezos-sandboxed-node.sh tezos-init-sandboxed-client.sh /usr/bin
       check:
       EOF
       cp ${node}/bin/tezos-node tarball/tezos/tezos-node
@@ -332,9 +338,11 @@ rec {
       cp ${client}/bin/tezos-client tarball/tezos/tezos-client
       cp ${client}/bin/tezos-admin-client tarball/tezos/tezos-admin-client
       cp ${client}/bin/tezos-init-sandboxed-client.sh tarball/tezos/tezos-init-sandboxed-client.sh
+      cp ${baker-alpha}/bin/tezos-baker-alpha tarball/tezos/tezos-baker-alpha
       patchelf tarball/tezos/tezos-node
       patchelf tarball/tezos/tezos-client
       patchelf tarball/tezos/tezos-admin-client
+      patchelf tarball/tezos/tezos-baker-alpha
       tar --transform='s#tarball/##' -rf $out tarball/tezos
     '';
 
