@@ -357,4 +357,11 @@ rec {
       ];
     };
   };
+  sandbox = pkgs.stdenv.mkDerivation {
+    name = "tezos-sandbox";
+    src = ./obsidian-scripts;
+    phases = [ "unpackPhase" ];
+    nativeBuildInputs = [node client baker-alpha];
+  };
 }
+
