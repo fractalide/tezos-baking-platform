@@ -363,5 +363,7 @@ rec {
     phases = [ "unpackPhase" ];
     nativeBuildInputs = [node client baker-alpha];
   };
+
+  tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {};
 }
 
