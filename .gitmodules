@@ -1,0 +1,6 @@
+[submodule "vendors/ocaml-hidapi"]
+	path = vendors/ocaml-hidapi
+	url = git@github.com:vbmithr/ocaml-hidapi
+[submodule "vendors/ocaml-ledger-wallet"]
+	path = vendors/ocaml-ledger-wallet
+	url = git@github.com:vbmithr/ocaml-ledger-wallet
