@@ -1,3 +1,9 @@
 [submodule "opam2nix-packages"]
 	path = opam2nix-packages
 	url = git@github.com:obsidiansystems/opam2nix-packages.git
+[submodule "vendors/ocaml-hidapi"]
+	path = vendors/ocaml-hidapi
+	url = git@github.com:vbmithr/ocaml-hidapi
+[submodule "vendors/ocaml-ledger-wallet"]
+	path = vendors/ocaml-ledger-wallet
+	url = git@github.com:vbmithr/ocaml-ledger-wallet
