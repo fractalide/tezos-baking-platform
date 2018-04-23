@@ -367,6 +367,8 @@ rec {
       '';
   };
 
-  tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {};
+  tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {
+    pkgs = import <nixpkgs> {};
+  };
 }
 
