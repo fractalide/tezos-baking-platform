@@ -82,9 +82,26 @@ rec {
         src = vendors/irmin-leveldb;
       }
       {
-        packageName = "secp256k1-internal";
+        packageName = "secp256k1";
         version = "0.1";
-        src = vendors/ocaml-secp256k1-internal;
+        src = vendors/ocaml-secp256k1;
+      }
+      {
+        packageName = "ledgerwallet-tezos";
+        version = "0.1";
+        src = vendors/ocaml-ledger-wallet;
+        opamFile = vendors/ocaml-ledger-wallet/ledgerwallet-tezos.opam;
+      }
+      {
+        packageName = "ledgerwallet";
+        version = "0.1";
+        src = vendors/ocaml-ledger-wallet;
+        opamFile = vendors/ocaml-ledger-wallet/ledgerwallet.opam;
+      }
+      {
+        packageName = "hidapi";
+        version = "0.1";
+        src = vendors/ocaml-hidapi;
       }
       {
         packageName = "tezos-clic";
@@ -280,6 +297,7 @@ rec {
       cpuid = addBuildInputs super.cpuid [ fauxpam ];
       nocrypto = addBuildInputs super.nocrypto [ fauxpam ];
       tezos-node = addBuildInputs super.tezos-node [ pkgs.snappy ];
+      hidapi = addBuildInputs super.hidapi [ pkgs.pkgconfig pkgs.hidapi ];
     });
   };
   node = opamSolution.packageSet.tezos-node;
