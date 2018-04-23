@@ -360,8 +360,11 @@ rec {
   sandbox = pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
     src = ./obsidian-scripts;
-    phases = [ "unpackPhase" ];
+    phases = [ "unpackPhase" "buildPhase" ];
     nativeBuildInputs = [node client baker-alpha];
+    buildPhase = ''
+      touch "$out"
+      '';
   };
 
   tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {};
