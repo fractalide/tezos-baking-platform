@@ -7,3 +7,9 @@
 [submodule "vendors/ocaml-ledger-wallet"]
 	path = vendors/ocaml-ledger-wallet
 	url = git@github.com:vbmithr/ocaml-ledger-wallet
+[submodule "obsidian-scripts/ledger/blue-app-ssh-agent"]
+	path = obsidian-scripts/ledger/blue-app-ssh-agent
+	url = git@github.com:ryantrinkle/blue-app-ssh-agent
+[submodule "obsidian-scripts/ledger/nanos-secure-sdk"]
+	path = obsidian-scripts/ledger/nanos-secure-sdk
+	url = git@github.com:LedgerHQ/nanos-secure-sdk
