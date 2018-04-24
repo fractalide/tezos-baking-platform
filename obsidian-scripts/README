@@ -1,0 +1,22 @@
+# These are the commands one must use to bake things:
+
+# Terminal A
+source obsidian-scripts/standalone-sandbox.inc.sh
+theworks # This runs forever, is a bunch of nodes trying to bake (initially nothing)
+
+# To build the ledger:
+cd ledger
+./build.sh
+./install.sh # Make sure that you have proper permissions to access the device in /dev
+
+# Once you have a ledger app, you can bake through the ledger as well:
+# Make sure your ledger is plugged in and has the app running
+source obsidian-scripts/standalone-sandbox.inc.sh
+client import ledger secret key my-ledger ed25519
+client transfer 3000000 from bootstrap5 to my-ledger
+client set delegate for my-ledger to my-ledger
+client launch daemon my-ledger -B -E -D
+
+# To check balances:
+watch_money
+client get balance for my_ledger
