@@ -1,3 +1,6 @@
 [submodule "opam2nix-packages"]
 	path = opam2nix-packages
 	url = git@github.com:obsidiansystems/opam2nix-packages.git
+[submodule "tezos-bake-central/focus"]
+	path = tezos-bake-central/focus
+	url = git@gitlab.com:obsidian.systems/focus.git
