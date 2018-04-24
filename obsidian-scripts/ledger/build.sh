@@ -12,5 +12,5 @@ export BOLOS_SDK="$PWD/nanos-secure-sdk"
 cd blue-app-ssh-agent
 export BOLOS_SDK=$BOLOS_SDK
 export BOLOS_ENV=$BOLOS_ENV
-make
+make $@
 EOF
