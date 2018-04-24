@@ -1,5 +1,7 @@
-{ pkgs ? import (builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/b6ddb9913f2.tar.gz";
+{ pkgs ?  import ((import <nixpkgs> {}).fetchFromGitHub {
+    owner = "NixOS";
+    repo = "nixpkgs";
+    rev = "b6ddb9913f2b8206837e0f137db907bdefb9275e";
     sha256 = "1yjbd5jhjgirv7ki0sms1x13dqyjzg0rpb7n67m6ik61fmpq0nfw";
   }) {}
 }:
@@ -368,7 +370,7 @@ rec {
   };
 
   tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {
-    pkgs = import <nixpkgs> {};
+    inherit pkgs;
   };
 }
 
