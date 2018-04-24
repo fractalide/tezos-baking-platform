@@ -6,7 +6,7 @@
 	url = git@github.com:ryantrinkle/ocaml-hidapi
 [submodule "vendors/ocaml-ledger-wallet"]
 	path = vendors/ocaml-ledger-wallet
-	url = git@github.com:vbmithr/ocaml-ledger-wallet
+	url = git@github.com:obsidiansystems/ocaml-ledger-wallet
 [submodule "obsidian-scripts/ledger/blue-app-ssh-agent"]
 	path = obsidian-scripts/ledger/blue-app-ssh-agent
 	url = git@github.com:ryantrinkle/blue-app-ssh-agent
