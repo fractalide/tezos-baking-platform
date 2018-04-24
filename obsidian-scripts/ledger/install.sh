@@ -6,4 +6,4 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd "$DIR"
 
 #TODO: Pin nixpkgs
-nix-shell -I nixpkgs=/home/ryan/nixpkgs2 -p python36Packages.{ecpy,hidapi,pycrypto,python-u2flib-host,requests,ledgerblue,pillow} --run 'python -m ledgerblue.loadApp --appFlags 0x00 --tlv --targetId 0x31100003 --delete --fileName blue-app-ssh-agent/bin/app.hex --appName "Tezos" --appVersion 1.0.0 $(ICONHEX=$(python nanos-secure-sdk/icon.py blue-app-ssh-agent/icon.gif hexbitmaponly 2>/dev/null) ; [ ! -z "$ICONHEX" ] && echo "--icon $ICONHEX")'
+nix-shell ledger-blue-shell.nix --run 'python -m ledgerblue.loadApp --appFlags 0x00 --tlv --targetId 0x31100003 --delete --fileName blue-app-ssh-agent/bin/app.hex --appName "Tezos" --appVersion 1.0.0 $(ICONHEX=$(python nanos-secure-sdk/icon.py blue-app-ssh-agent/icon.gif hexbitmaponly 2>/dev/null) ; [ ! -z "$ICONHEX" ] && echo "--icon $ICONHEX")'
