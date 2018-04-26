@@ -484,6 +484,9 @@ rec {
       node_args=("--config-file=$out/node-\$nodeid/config.json")
       if [ "\$1" == "run" ] ; then
         node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json")
+        for peerid in \$(seq 1 ${max_peer_id}) ; do
+          node_args=("\''${node_args[@]}" "--peer=127.0.0.1:\$((19730 + peerid))")
+        done
       fi;
 
       exec ${node}/bin/tezos-node "\$@" "\''${node_args[@]}"
@@ -496,7 +499,8 @@ rec {
         if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
           $out/bin/tezos-sandbox-node.sh \$nodeid identity generate ${expected_pow}
         fi
-        $out/bin/tezos-sandbox-node.sh \$nodeid run >${datadir}/node-\$nodeid.log 2>&1 &
+        # logfile is already redirected by config
+        $out/bin/tezos-sandbox-node.sh \$nodeid run &
       done
       EOF_NETWORK
 
