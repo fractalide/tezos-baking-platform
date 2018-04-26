@@ -1,11 +1,12 @@
 # These are the commands one must use to bake things:
 
 # Terminal A
+# Go into the root directory of tezos repo
 source obsidian-scripts/standalone-sandbox.inc.sh
 theworks # This runs forever, is a bunch of nodes trying to bake (initially nothing)
 
-# To build the ledger:
-cd ledger
+# To build and install the ledger:
+cd obsidian-scripts/ledger
 ./build.sh
 ./install.sh # Make sure that you have proper permissions to access the device in /dev
 
