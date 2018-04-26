@@ -21,7 +21,7 @@ Requires: libstdc++
 Requires: snappy
 Requires: compat-openssl10
 Requires: leveldb
-
+Requires: hidapi
 
 %description
 
@@ -60,6 +60,7 @@ patchelf --set-rpath "%{_libdir}" \
          ./tezos-baker-alpha
 
 # patchbash?
+# TODO: also get the "nicer" sandbox scripts
 sed -i '1s@#![[:space:]]*/nix/store/[^/]*/bin@%{_bindir}@' ./tezos-sandboxed-node.sh
 
 # ldd ./tezos-node
