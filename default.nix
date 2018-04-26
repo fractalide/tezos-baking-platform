@@ -387,9 +387,12 @@ rec {
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
     src = ./scripts;
-    phases = [ "unpackPhase" "buildPhase" ];
-    nativeBuildInputs = [pkgs.jq node client baker-alpha tezos-bake-monitor];
+    configurePhase = "true";
+    installPhase = "true";
+    nativeBuildInputs = [pkgs.jq node client];
+    buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor];
     buildPhase = ''
+      set -x
       mkdir -p $out/bin
       mkdir -p $out/client
 
@@ -438,7 +441,7 @@ rec {
       EOF_CLIENTCONFIG
 
       cat > $out/bin/bootstrap-env.sh <<EOF_BOOTSTRAP
-      #/bin/bash -x
+      #/usr/bin/env bash
         bootstrap_secrets=(
           "edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
           "edsk39qAm1fiMjgmPkw1EgQYkMzkJezLNewd7PLNHTkr6w9XA2zdfo"
@@ -456,7 +459,7 @@ rec {
       EOF_BOOTSTRAP
 
       cat > $out/bin/bootstrap-alphanet.sh <<EOF_ALPHANET
-      #/bin/bash -x
+      #/usr/bin/env bash
         $out/bin/tezos-sandbox-client.sh \
             -block genesis \
             bootstrapped
@@ -469,16 +472,16 @@ rec {
       EOF_ALPHANET
 
       # create wrapper around client programs, setting arguments for working
-      # within the sandbox.  programs will connect to peer 1; but can be given
+      # within the sandbox.  programs will connect to peer 1 but can be given
       # CLI flags to do otherwise, as the normal client programs already do.
       cat > $out/bin/tezos-sandbox-client.sh <<EOF_CLIENT
-      #!/bin/bash -x
+      #!/usr/bin/env bash
       exec ${client}/bin/tezos-client "--config-file" "$out/client/config" "\$@"
       EOF_CLIENT
 
       # create a wrapper around tezos-node setting arguments for working within the sandbox
       cat > $out/bin/tezos-sandbox-node.sh <<EOF_NODE
-      #!/bin/bash -x
+      #!/usr/bin/env bash
       set -e ; nodeid="\$1" ; shift
 
       node_args=("--config-file=$out/node-\$nodeid/config.json")
@@ -493,7 +496,7 @@ rec {
       EOF_NODE
 
       cat > $out/bin/tezos-sandbox-network.sh <<EOF_NETWORK
-      #!/bin/bash -x
+      #!/usr/bin/env bash
       for nodeid in \$(seq 1 ${max_peer_id}) ; do
         mkdir -p "${datadir}/node-\$nodeid"
         if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
@@ -505,14 +508,14 @@ rec {
       EOF_NETWORK
 
       cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
-      #!/bin/bash -x
+      #!/usr/bin/env bash
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
         $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
       done
       EOF_BOOTBAKE
 
       cat > $out/bin/tezos-sandbox-theworks.sh <<EOF_THEWORKS
-      #!/bin/bash -x
+      #!/usr/bin/env bash
       mkdir -p ${datadir}
       $out/bin/tezos-sandbox-network.sh
       $out/bin/bootstrap-env.sh
