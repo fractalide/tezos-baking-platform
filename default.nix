@@ -532,5 +532,9 @@ rec {
     inherit pkgs;
   };
 
+  tezos-loadtest = pkgs.callPackage ./tezos-loadtest {
+    inherit pkgs;
+  };
+
 }
 
