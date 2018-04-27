@@ -8,6 +8,13 @@ cd obsidian-scripts/ledger
 # Go into the root directory of tezos repo
 nix-shell obsidian-scripts/sandbox.nix
 tezos-sandbox-theworks.sh
+
+# When you're done (or before you start again) to clean up and start
+# over with a new sandbox:
+killall tezos-client
+killall tezos-node
+rm -rf sandbox
+
 # To see progress
 tail -F sandbox/clientd-bootstrap1.log
 
