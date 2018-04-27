@@ -383,24 +383,28 @@ rec {
       , datadir ? "./sandbox"
       , max_peer_id ? "9"
       , expected_connections ? "3"
+      , time_between_blocks ? "[5, 5]"
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
-    src = ./scripts;
+    src = ./.;
     configurePhase = "true";
     installPhase = "true";
     nativeBuildInputs = [pkgs.jq node client];
-    buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor];
+    buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor tezos-loadtest];
     buildPhase = ''
       set -x
       mkdir -p $out/bin
       mkdir -p $out/client
 
-      cp ./sandbox.json $out
-      cat < ./protocol_parameters.json \
-        | jq '.time_between_blocks = [5,5]' \
+      cp ./scripts/sandbox.json $out
+      cat < ./scripts/protocol_parameters.json \
+        | jq '.time_between_blocks = $tbb' --argjson tbb '${time_between_blocks}' \
         > $out/protocol_parameters.json
 
+      cat < ./tezos-loadtest/config.json \
+        | jq '._client_exe = $client' --arg client $out/bin/tezos-sandbox-client.sh \
+        > $out/loadtest-config.json
 
       # generate node sandbox config
       for nodeid in $(seq 1 ${max_peer_id}) ; do
@@ -521,6 +525,12 @@ rec {
       $out/bin/bootstrap-env.sh
       $out/bin/bootstrap-alphanet.sh
       $out/bin/bootstrap-baking.sh
+
+      if [ ! -f "${datadir}/loadtest-config.json" ] ; then
+        cp $out/loadtest-config.json "${datadir}/loadtest-config.json"
+      fi
+      echo "Generating transactions.  (press ^C at any time)"
+      ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
 
       chmod +x $out/bin/*.sh
