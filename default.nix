@@ -514,7 +514,7 @@ rec {
       cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
       #!/usr/bin/env bash
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
-        $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D -M --monitor-port \$((17730+\$bootstrapid)) >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
       done
       EOF_BOOTBAKE
 
