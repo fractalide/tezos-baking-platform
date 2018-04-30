@@ -387,13 +387,13 @@ rec {
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
-    src = ./.;
+    src = lib.sourceByRegex ./. ["scripts.*" "tezos-loadtest.*"];
+
     configurePhase = "true";
     installPhase = "true";
     nativeBuildInputs = [pkgs.jq node client];
     buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor tezos-loadtest];
     buildPhase = ''
-      set -x
       mkdir -p $out/bin
       mkdir -p $out/client
 
