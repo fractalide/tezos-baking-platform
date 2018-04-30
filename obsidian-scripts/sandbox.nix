@@ -13,6 +13,7 @@
       parentpkg.client
       parentpkg.baker-alpha
       parentpkg.tezos-bake-monitor
+      parentpkg.tezos-loadtest
       (parentpkg.sandbox {})
     ];
   }

@@ -528,6 +528,7 @@ rec {
 
       if [ ! -f "${datadir}/loadtest-config.json" ] ; then
         cp $out/loadtest-config.json "${datadir}/loadtest-config.json"
+        chmod 644 "${datadir}/loadtest-config.json"
       fi
       echo "Generating transactions.  (press ^C at any time)"
       ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
