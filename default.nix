@@ -549,9 +549,7 @@ rec {
     inherit pkgs;
   };
 
-  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {
-    inherit pkgs;
-  };
+  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {};
 
 }
 
