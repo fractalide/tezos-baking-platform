@@ -386,6 +386,33 @@ rec {
       , time_between_blocks ? "[5, 5]"
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
+    name = "tezos-sandbox-sandbox";
+    src = null;
+    doUnpack = false;
+    phases = [ "buildPhase" ];
+    buildPhase = "mkdir -p $out";
+    nativeBuildInputs = [
+      (sandbox-env {
+        inherit expected_pow datadir max_peer_id expected_connections time_between_blocks;
+      })
+      node
+      client
+      baker-alpha
+      tezos-bake-monitor
+      tezos-loadtest
+      pkgs.psmisc
+      pkgs.jq
+    ];
+  };
+
+  sandbox-env =
+      { expected_pow # Floating point number between 0 and 256 that represents a difficulty, 24 signifies for example that at least 24 leading zeroes are expected in the hash.
+      , datadir
+      , max_peer_id
+      , expected_connections
+      , time_between_blocks
+      # TODO: protocol parameters, especially time_between_blocks
+  } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
     src = lib.sourceByRegex ./. ["scripts.*" "tezos-loadtest.*"];
 
@@ -486,6 +513,7 @@ rec {
       # create a wrapper around tezos-node setting arguments for working within the sandbox
       cat > $out/bin/tezos-sandbox-node.sh <<EOF_NODE
       #!/usr/bin/env bash
+      set -x
       set -e ; nodeid="\$1" ; shift
 
       node_args=("--config-file=$out/node-\$nodeid/config.json")
@@ -501,37 +529,67 @@ rec {
 
       cat > $out/bin/tezos-sandbox-network.sh <<EOF_NETWORK
       #!/usr/bin/env bash
+      set -x
       for nodeid in \$(seq 1 ${max_peer_id}) ; do
         mkdir -p "${datadir}/node-\$nodeid"
         if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
           $out/bin/tezos-sandbox-node.sh \$nodeid identity generate ${expected_pow}
         fi
         # logfile is already redirected by config
-        $ $out/bin/tezos-sandbox-node.sh \$nodeid run >/dev/null 2>&1 &
         $out/bin/tezos-sandbox-node.sh \$nodeid run &
       done
       EOF_NETWORK
 
       cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
       #!/usr/bin/env bash
+      set -x
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
         # ${tezos-bake-monitor}/bin/tezos-bake-monitor --port "\$((9800 + bootstrapid))" --rpchost "http://127.0.0.1:\$((18730 + bootstrapid))" -- $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
         $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
       done
       EOF_BOOTBAKE
 
-      cat > $out/bin/tezos-sandbox-theworks.sh <<EOF_THEWORKS
+      cat > $out/bin/tezos-sandbox-bootstrap.sh <<EOF_FULLBOOT
       #!/usr/bin/env bash
+      set -x
       mkdir -p ${datadir}
-      $out/bin/tezos-sandbox-network.sh
-      $out/bin/bootstrap-env.sh
-      $out/bin/bootstrap-alphanet.sh
-      # $out/bin/bootstrap-baking.sh
-
       if [ ! -f "${datadir}/loadtest-config.json" ] ; then
         cp $out/loadtest-config.json "${datadir}/loadtest-config.json"
         chmod 644 "${datadir}/loadtest-config.json"
       fi
+
+      $out/bin/tezos-sandbox-network.sh
+      $out/bin/bootstrap-env.sh
+      $out/bin/bootstrap-alphanet.sh
+      EOF_FULLBOOT
+
+
+      cat > $out/bin/monitored-bakers.sh << EOF_MONITBAKER
+      #!/usr/bin/env bash
+      set -eux
+
+      for i in \$(seq 1 "\$#") ; do
+          echo "LAUNCH BAKER:" "\''${!i}"
+          tezos-bake-monitor --port \$((9800 + i)) --rpchost 127.0.0.1:\$(((i - 1) % ${max_peer_id} + 18731)) --client $out/bin/tezos-sandbox-client.sh --identity "\''${!i}" & pid=\$!
+          sleep 1
+          if ! kill -0 \$pid; then
+              echo >&2 "Problem launching tezos-bake-monitor: \$pid"
+              false
+          fi
+      done
+      EOF_MONITBAKER
+
+      cat > $out/bin/tezos-sandbox-theworks.sh <<EOF_THEWORKS
+      #!/usr/bin/env bash
+      set -x
+      $out/bin/tezos-sandbox-bootstrap.sh
+      sleep 7
+
+      $out/bin/monitored-bakers.sh bootstrap0 bootstrap1 bootstrap2 bootstrap3 bootstrap4
+
+      # don't start the load test until some progress has been made by the bootstrap bakers.
+      while [ 3 -gt "\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' | jq '.level')" ] ; do sleep 1 ; done
+
       # echo "Generating transactions.  (press ^C at any time)"
       # ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
@@ -549,9 +607,7 @@ rec {
     inherit pkgs;
   };
 
-  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {
-    inherit pkgs;
-  };
+  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {};
 
 }
 
