@@ -383,24 +383,28 @@ rec {
       , datadir ? "./sandbox"
       , max_peer_id ? "9"
       , expected_connections ? "3"
+      , time_between_blocks ? "[5, 5]"
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
-    src = ./scripts;
+    src = lib.sourceByRegex ./. ["scripts.*" "tezos-loadtest.*"];
+
     configurePhase = "true";
     installPhase = "true";
-    nativeBuildInputs = [pkgs.jq node client];
-    buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor];
+    nativeBuildInputs = [pkgs.psmisc pkgs.jq node client];
+    buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor tezos-loadtest];
     buildPhase = ''
-      set -x
       mkdir -p $out/bin
       mkdir -p $out/client
 
-      cp ./sandbox.json $out
-      cat < ./protocol_parameters.json \
-        | jq '.time_between_blocks = [5,5]' \
+      cp ./scripts/sandbox.json $out
+      cat < ./scripts/protocol_parameters.json \
+        | jq '.time_between_blocks = $tbb' --argjson tbb '${time_between_blocks}' \
         > $out/protocol_parameters.json
 
+      cat < ./tezos-loadtest/config.json \
+        | jq '._client_exe = $client' --arg client $out/bin/tezos-sandbox-client.sh \
+        > $out/loadtest-config.json
 
       # generate node sandbox config
       for nodeid in $(seq 1 ${max_peer_id}) ; do
@@ -503,6 +507,7 @@ rec {
           $out/bin/tezos-sandbox-node.sh \$nodeid identity generate ${expected_pow}
         fi
         # logfile is already redirected by config
+        $ $out/bin/tezos-sandbox-node.sh \$nodeid run >/dev/null 2>&1 &
         $out/bin/tezos-sandbox-node.sh \$nodeid run &
       done
       EOF_NETWORK
@@ -510,6 +515,7 @@ rec {
       cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
       #!/usr/bin/env bash
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
+        # ${tezos-bake-monitor}/bin/tezos-bake-monitor --port "\$((9800 + bootstrapid))" --rpchost "http://127.0.0.1:\$((18730 + bootstrapid))" -- $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
         $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
       done
       EOF_BOOTBAKE
@@ -520,7 +526,14 @@ rec {
       $out/bin/tezos-sandbox-network.sh
       $out/bin/bootstrap-env.sh
       $out/bin/bootstrap-alphanet.sh
-      $out/bin/bootstrap-baking.sh
+      # $out/bin/bootstrap-baking.sh
+
+      if [ ! -f "${datadir}/loadtest-config.json" ] ; then
+        cp $out/loadtest-config.json "${datadir}/loadtest-config.json"
+        chmod 644 "${datadir}/loadtest-config.json"
+      fi
+      # echo "Generating transactions.  (press ^C at any time)"
+      # ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
 
       chmod +x $out/bin/*.sh
@@ -529,6 +542,14 @@ rec {
   };
 
   tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {
+    inherit pkgs;
+  };
+
+  tezos-loadtest = pkgs.callPackage ./tezos-loadtest {
+    inherit pkgs;
+  };
+
+  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {
     inherit pkgs;
   };
 
