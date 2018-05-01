@@ -391,7 +391,7 @@ rec {
 
     configurePhase = "true";
     installPhase = "true";
-    nativeBuildInputs = [pkgs.jq node client];
+    nativeBuildInputs = [pkgs.psmisc pkgs.jq node client];
     buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor tezos-loadtest];
     buildPhase = ''
       mkdir -p $out/bin
@@ -546,6 +546,10 @@ rec {
   };
 
   tezos-loadtest = pkgs.callPackage ./tezos-loadtest {
+    inherit pkgs;
+  };
+
+  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {
     inherit pkgs;
   };
 

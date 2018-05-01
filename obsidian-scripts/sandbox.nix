@@ -16,5 +16,6 @@
       parentpkg.tezos-loadtest
       (parentpkg.sandbox {})
       pkgs.psmisc
+      pkgs.jq
     ];
   }
