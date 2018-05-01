@@ -507,6 +507,7 @@ rec {
           $out/bin/tezos-sandbox-node.sh \$nodeid identity generate ${expected_pow}
         fi
         # logfile is already redirected by config
+        $ $out/bin/tezos-sandbox-node.sh \$nodeid run >/dev/null 2>&1 &
         $out/bin/tezos-sandbox-node.sh \$nodeid run &
       done
       EOF_NETWORK
@@ -514,6 +515,7 @@ rec {
       cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
       #!/usr/bin/env bash
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
+        # ${tezos-bake-monitor}/bin/tezos-bake-monitor --port "\$((9800 + bootstrapid))" --rpchost "http://127.0.0.1:\$((18730 + bootstrapid))" -- $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
         $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
       done
       EOF_BOOTBAKE
@@ -524,14 +526,14 @@ rec {
       $out/bin/tezos-sandbox-network.sh
       $out/bin/bootstrap-env.sh
       $out/bin/bootstrap-alphanet.sh
-      $out/bin/bootstrap-baking.sh
+      # $out/bin/bootstrap-baking.sh
 
       if [ ! -f "${datadir}/loadtest-config.json" ] ; then
         cp $out/loadtest-config.json "${datadir}/loadtest-config.json"
         chmod 644 "${datadir}/loadtest-config.json"
       fi
-      echo "Generating transactions.  (press ^C at any time)"
-      ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
+      # echo "Generating transactions.  (press ^C at any time)"
+      # ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
 
       chmod +x $out/bin/*.sh
