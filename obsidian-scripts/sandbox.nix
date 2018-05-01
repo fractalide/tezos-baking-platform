@@ -15,5 +15,6 @@
       parentpkg.tezos-bake-monitor
       parentpkg.tezos-loadtest
       (parentpkg.sandbox {})
+      pkgs.psmisc
     ];
   }
