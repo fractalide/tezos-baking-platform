@@ -429,6 +429,7 @@ rec {
         | jq '.time_between_blocks = $tbb' --argjson tbb '${time_between_blocks}' \
         > $out/protocol_parameters.json
 
+      # TODO: Set traders/bakers/nodes
       cat < ./tezos-loadtest/config.json \
         | jq '._client_exe = $client' --arg client $out/bin/tezos-sandbox-client.sh \
         > $out/loadtest-config.json
@@ -600,15 +601,15 @@ rec {
       while true ; do
         blockhead="\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' 2>/dev/null)"
         blockhead_ok=\$?
-        if [ \$blockhead_ok -eq 0 -and 3 -le "\$(\$blockhead_ok | jq '.level')" ] ; then
+        if [ \$blockhead_ok -eq 0 -a 3 -le "\$(jq '.level' <<< "\$blockhead")" ] ; then
           break
         else
-          do sleep 1
+          sleep 1
         fi
       done
 
       # echo "Generating transactions.  (press ^C at any time)"
-      # ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
+      ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
 
       chmod +x $out/bin/*.sh
