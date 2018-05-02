@@ -6,20 +6,17 @@ cd obsidian-scripts/ledger
 ./install.sh # Make sure that you have proper permissions to access the device in /dev
 
 # Go into the root directory of tezos repo
-nix-shell obsidian-scripts/sandbox.nix
-tezos-sandbox-theworks.sh
+nix-shell -A sandbox --argstr max_peer_id 1 # make 1 higher for not testing ledger stuff
+obsidian-scripts/jimmy-works.sh
 
-# When you're done (or before you start again) to clean up and start
-# over with a new sandbox:
+# The script should perform clean-up at the beginning, but to clean up
+# after, run:
 killall tezos-client
 killall tezos-node
 rm -rf sandbox
 
-# To see progress
-tail -F sandbox/clientd-bootstrap1.log
-
-# Once you have a ledger app, you can bake through the ledger as well:
-# Make sure your ledger is plugged in and has the app running
+# These are the commands the script uses to do this baking, in case you would
+# rather use a different version of theworks than jimmy-works:
 
 tezos-sandbox-client.sh import ledger secret key my-ledger ed25519
 tezos-sandbox-client.sh transfer 3000000 from bootstrap5 to my-ledger
@@ -28,3 +25,5 @@ tezos-sandbox-client.sh launch daemon my-ledger -B -E -D
 
 # To check balances:
 tezos-sandbox-client.sh get balance for my_ledger
+tezos-sandbox-client.sh get balance for bootstrap0
+tezos-sandbox-client.sh get balance for bootstrap1
