@@ -473,6 +473,7 @@ rec {
 
       cat > $out/bin/bootstrap-env.sh <<EOF_BOOTSTRAP
       #/usr/bin/env bash
+        set -xe
         bootstrap_secrets=(
           "edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
           "edsk39qAm1fiMjgmPkw1EgQYkMzkJezLNewd7PLNHTkr6w9XA2zdfo"
@@ -481,6 +482,7 @@ rec {
           "edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm"
         )
 
+        $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
           $out/bin/tezos-sandbox-client.sh import unencrypted secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
         done
@@ -507,16 +509,23 @@ rec {
       # CLI flags to do otherwise, as the normal client programs already do.
       cat > $out/bin/tezos-sandbox-client.sh <<EOF_CLIENT
       #!/usr/bin/env bash
+      set -ex
       exec ${client}/bin/tezos-client "--config-file" "$out/client/config" "\$@"
       EOF_CLIENT
 
       # create a wrapper around tezos-node setting arguments for working within the sandbox
       cat > $out/bin/tezos-sandbox-node.sh <<EOF_NODE
       #!/usr/bin/env bash
-      set -x
-      set -e ; nodeid="\$1" ; shift
+      set -xe ; nodeid="\$1" ; shift
 
       node_args=("--config-file=$out/node-\$nodeid/config.json")
+
+      mkdir -p "${datadir}/node-\$nodeid"
+      if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
+        ${node}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+      fi
+
+      # logfile is already redirected by config
       if [ "\$1" == "run" ] ; then
         node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json")
         for peerid in \$(seq 1 ${max_peer_id}) ; do
@@ -529,20 +538,15 @@ rec {
 
       cat > $out/bin/tezos-sandbox-network.sh <<EOF_NETWORK
       #!/usr/bin/env bash
-      set -x
+      set -ex
       for nodeid in \$(seq 1 ${max_peer_id}) ; do
-        mkdir -p "${datadir}/node-\$nodeid"
-        if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
-          $out/bin/tezos-sandbox-node.sh \$nodeid identity generate ${expected_pow}
-        fi
-        # logfile is already redirected by config
         $out/bin/tezos-sandbox-node.sh \$nodeid run &
       done
       EOF_NETWORK
 
       cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
       #!/usr/bin/env bash
-      set -x
+      set -ex
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
         # ${tezos-bake-monitor}/bin/tezos-bake-monitor --port "\$((9800 + bootstrapid))" --rpchost "http://127.0.0.1:\$((18730 + bootstrapid))" -- $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
         $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
@@ -551,7 +555,7 @@ rec {
 
       cat > $out/bin/tezos-sandbox-bootstrap.sh <<EOF_FULLBOOT
       #!/usr/bin/env bash
-      set -x
+      set -ex
       mkdir -p ${datadir}
       if [ ! -f "${datadir}/loadtest-config.json" ] ; then
         cp $out/loadtest-config.json "${datadir}/loadtest-config.json"
@@ -559,6 +563,12 @@ rec {
       fi
 
       $out/bin/tezos-sandbox-network.sh
+
+      until $out/bin/tezos-sandbox-client.sh bootstrapped 2>/dev/null ; do
+        echo -n .
+        sleep 1
+      done
+
       $out/bin/bootstrap-env.sh
       $out/bin/bootstrap-alphanet.sh
       EOF_FULLBOOT
@@ -581,14 +591,21 @@ rec {
 
       cat > $out/bin/tezos-sandbox-theworks.sh <<EOF_THEWORKS
       #!/usr/bin/env bash
-      set -x
+      set -ex
       $out/bin/tezos-sandbox-bootstrap.sh
-      sleep 7
 
       $out/bin/monitored-bakers.sh bootstrap0 bootstrap1 bootstrap2 bootstrap3 bootstrap4
 
       # don't start the load test until some progress has been made by the bootstrap bakers.
-      while [ 3 -gt "\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' | jq '.level')" ] ; do sleep 1 ; done
+      while true ; do
+        blockhead="\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' 2>/dev/null)"
+        blockhead_ok=\$?
+        if [ \$blockhead_ok -eq 0 -and 3 -le "\$(\$blockhead_ok | jq '.level')" ] ; then
+          break
+        else
+          do sleep 1
+        fi
+      done
 
       # echo "Generating transactions.  (press ^C at any time)"
       # ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
@@ -608,6 +625,45 @@ rec {
   };
 
   tezos-bake-central = pkgs.callPackage ./tezos-bake-central {};
+
+  docker-image =
+  let
+    pkgs = (import <nixpkgs> {});
+    mySandbox = sandbox-env {
+        expected_pow = "20";
+        datadir = "./sandbox";
+        max_peer_id = "9";
+        expected_connections = "3";
+        time_between_blocks = "[5, 5]";
+      };
+  in pkgs.dockerTools.buildImage {
+    name = "tezos";
+    contents = [
+      mySandbox
+      node
+      client
+      tezos-bake-monitor
+      tezos-loadtest
+      pkgs.jq
+    ];
+    keepContentsDirlinks = true;
+    config = {
+      Env = [
+        # When shell=true, mesos invokes "sh -c '<cmd>'", so make sure "sh" is
+        # on the PATH.
+        ("PATH=" + builtins.concatStringsSep(":")([
+          "${pkgs.stdenv.shellPackage}/bin"
+          "${pkgs.coreutils}/bin"
+          "${node}/bin"
+          "${client}/bin"
+          "${mySandbox}/bin"
+          "${pkgs.jq}/bin"
+          ]))
+      ];
+      # Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
+      Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
+    };
+  };
 
 }
 
