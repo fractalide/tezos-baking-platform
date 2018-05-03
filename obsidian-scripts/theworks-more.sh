@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set +x
 killall tezos-client
 killall tezos-node
 rm -rf sandbox
@@ -25,7 +27,10 @@ cat < ./tezos-loadtest/config.json \
     > sandbox/loadtest-config.json
 
 tezos-sandbox-client.sh bootstrapped
-sleep 3
+
+# don't start the load test until some progress has been made by the bootstrap bakers.
+while [ 3 -gt "$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' | jq '.level')" ] ; do sleep 1 ; done
+
 
 tezos-loadtest sandbox/loadtest-config.json
 
