@@ -6,7 +6,7 @@ cd obsidian-scripts/ledger
 ./install.sh # Make sure that you have proper permissions to access the device in /dev
 
 # Go into the root directory of tezos repo
-nix-shell -A sandbox --argstr max_peer_id 1 # make 1 higher for not testing ledger stuff
+nix-shell -A sandbox --argstr max_peer_id 2 # make 1 higher for not testing ledger stuff
 obsidian-scripts/jimmy-works.sh
 
 # The script should perform clean-up at the beginning, but to clean up
@@ -24,6 +24,6 @@ tezos-sandbox-client.sh set delegate for my-ledger to my-ledger
 tezos-sandbox-client.sh launch daemon my-ledger -B -E -D
 
 # To check balances:
-tezos-sandbox-client.sh get balance for my_ledger
+tezos-sandbox-client.sh get balance for my-ledger
 tezos-sandbox-client.sh get balance for bootstrap0
 tezos-sandbox-client.sh get balance for bootstrap1
