@@ -6,8 +6,7 @@ cd obsidian-scripts/ledger
 ./install.sh # Make sure that you have proper permissions to access the device in /dev
 
 # Go into the root directory of tezos repo
-nix-shell -A sandbox --argstr max_peer_id 2 # make 1 higher for not testing ledger stuff
-obsidian-scripts/jimmy-works.sh
+obsidian-scripts/jimmy-works-outer.sh # This runs nix-shell internally
 
 # The script should perform clean-up at the beginning, but to clean up
 # after, run:
