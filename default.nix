@@ -627,44 +627,44 @@ rec {
 
   tezos-bake-central = pkgs.callPackage ./tezos-bake-central {};
 
-  docker-image =
-  let
-    pkgs = (import <nixpkgs> {});
-    mySandbox = sandbox-env {
-        expected_pow = "20";
-        datadir = "./sandbox";
-        max_peer_id = "9";
-        expected_connections = "3";
-        time_between_blocks = "[5, 5]";
-      };
-  in pkgs.dockerTools.buildImage {
-    name = "tezos";
-    contents = [
-      mySandbox
-      node
-      client
-      tezos-bake-monitor
-      tezos-loadtest
-      pkgs.jq
-    ];
-    keepContentsDirlinks = true;
-    config = {
-      Env = [
-        # When shell=true, mesos invokes "sh -c '<cmd>'", so make sure "sh" is
-        # on the PATH.
-        ("PATH=" + builtins.concatStringsSep(":")([
-          "${pkgs.stdenv.shellPackage}/bin"
-          "${pkgs.coreutils}/bin"
-          "${node}/bin"
-          "${client}/bin"
-          "${mySandbox}/bin"
-          "${pkgs.jq}/bin"
-          ]))
-      ];
-      # Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
-      Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
-    };
-  };
+  # docker-image =
+  # let
+  #   pkgs = (import <nixpkgs> {});
+  #   mySandbox = sandbox-env {
+  #       expected_pow = "20";
+  #       datadir = "./sandbox";
+  #       max_peer_id = "9";
+  #       expected_connections = "3";
+  #       time_between_blocks = "[5, 5]";
+  #     };
+  # in pkgs.dockerTools.buildImage {
+  #   name = "tezos";
+  #   contents = [
+  #     mySandbox
+  #     node
+  #     client
+  #     tezos-bake-monitor
+  #     tezos-loadtest
+  #     pkgs.jq
+  #   ];
+  #   keepContentsDirlinks = true;
+  #   config = {
+  #     Env = [
+  #       # When shell=true, mesos invokes "sh -c '<cmd>'", so make sure "sh" is
+  #       # on the PATH.
+  #       ("PATH=" + builtins.concatStringsSep(":")([
+  #         "${pkgs.stdenv.shellPackage}/bin"
+  #         "${pkgs.coreutils}/bin"
+  #         "${node}/bin"
+  #         "${client}/bin"
+  #         "${mySandbox}/bin"
+  #         "${pkgs.jq}/bin"
+  #         ]))
+  #     ];
+  #     # Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
+  #     Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
+  #   };
+  # };
 
 }
 
