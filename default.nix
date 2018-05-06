@@ -537,11 +537,56 @@ rec {
       exec ${node}/bin/tezos-node "\$@" "\''${node_args[@]}"
       EOF_NODE
 
+      # as above, but creates a fragile network where the loss of peer 1 causes a split-brain situation.
+      # theory: a=b=c-d-e=f=g will not lead to a fork, but removing d, having
+      #         a=b=c   e=f=g should produce a fork.
+
+      # sketch:
+      # - create a network that looks like: a=b=c-d-e=f=g
+      # - bake on both sides of the brittle connection
+      # - break the brittle connection
+      # - bake on both hemispheres of the split-brain
+      # - observe height on diverted forks.
+      cat > $out/bin/tezos-sandbox-fragile-node.sh <<EOF_FRAGILENODE
+      #!/usr/bin/env bash
+      set -xe ; nodeid="\$1" ; shift
+
+      node_args=("--config-file=$out/node-\$nodeid/config.json")
+
+      mkdir -p "$out/node-$nodeid"
+      if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
+        ${node}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+      fi
+
+      left_hemisphere=($(seq 2 2 ${max_peer_id}) )
+      right_hemisphere=($(seq 3 2 ${max_peer_id}) )
+      left_peers=( \''${left_hemisphere[@]} 1 )
+      right_peers=( \''${right_hemisphere[@]} 1)
+      fragile_peers=( \$(seq 1 $(( ${max_peer_id} / 2 ))))
+
+      # logfile is already redirected by config
+      if [ "\$1" == "run" ] ; then
+        node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json" "--closed" "--no-bootstrap-peers")
+        if [ "\$nodeid" -eq 1 ] ; then
+          node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${fragile_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        elif [ \$(( "\$nodeid" % 2 )) -eq 0 ] ; then
+          node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${left_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        else
+          node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${right_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        fi
+      fi
+
+      exec ${node}/bin/tezos-node "\$@" "\''${node_args[@]}"
+      EOF_FRAGILENODE
+
+
       cat > $out/bin/tezos-sandbox-network.sh <<EOF_NETWORK
       #!/usr/bin/env bash
       set -ex
+      dflt_node_exe="$out/bin/tezos-sandbox-node.sh"
+      node_exe="\''${NODE_EXE:-\$dflt_node_exe}"
       for nodeid in \$(seq 1 ${max_peer_id}) ; do
-        $out/bin/tezos-sandbox-node.sh \$nodeid run &
+        \$node_exe \$nodeid run &
       done
       EOF_NETWORK
 
