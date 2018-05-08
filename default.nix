@@ -91,19 +91,38 @@ rec {
       {
         packageName = "ledgerwallet-tezos";
         version = "0.1";
-        src = tezos/vendors/ocaml-ledger-wallet;
-        opamFile = tezos/vendors/ocaml-ledger-wallet/ledgerwallet-tezos.opam;
+        # src = tezos/vendors/ocaml-ledger-wallet;
+        src = pkgs.fetchgit {
+          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
+          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
+          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
+          fetchSubmodules= true;
+        };
+        opamFile = "ledgerwallet-tezos.opam";
       }
       {
         packageName = "ledgerwallet";
-        version = "0.1";
-        src = tezos/vendors/ocaml-ledger-wallet;
-        opamFile = tezos/vendors/ocaml-ledger-wallet/ledgerwallet.opam;
+        version = "dev";
+        # src = tezos/vendors/ocaml-ledger-wallet;
+        src = pkgs.fetchgit {
+          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
+          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
+          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
+          fetchSubmodules= true;
+        };
+         opamFile = "ledgerwallet.opam";
       }
+
       {
         packageName = "hidapi";
-        version = "0.1";
-        src = tezos/vendors/ocaml-hidapi;
+        version = "dev";
+        # src = tezos/vendors/ocaml-hidapi;
+        src = pkgs.fetchgit {
+          url= "https://github.com/ryantrinkle/ocaml-hidapi";
+          rev= "6d232b19e68a265acbb25d6194caa937cd64ba1f";
+          sha256= "017cnl6w6bggcc3db697xprr881gp3fnrl913mp6dvrns46gj2pa";
+          fetchSubmodules= true;
+        };
       }
       {
         packageName = "tezos-clic";
@@ -414,7 +433,9 @@ rec {
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
-    src = lib.sourceByRegex ./. ["scripts.*" "tezos-loadtest.*"];
+    # src = lib.sourceByRegex ./. ["tezos.scripts.*" "tezos-loadtest.*"];
+    sourceRoot = ".";
+    srcs = [./tezos/scripts  ./tezos-load-testing ];
 
     configurePhase = "true";
     installPhase = "true";
@@ -430,7 +451,7 @@ rec {
         > $out/protocol_parameters.json
 
       # TODO: Set traders/bakers/nodes
-      cat < ./tezos-loadtest/config.json \
+      cat < ./tezos-load-testing/config.json \
         | jq '._client_exe = $client' --arg client $out/bin/tezos-sandbox-client.sh \
         > $out/loadtest-config.json
 
