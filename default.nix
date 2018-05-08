@@ -42,7 +42,7 @@ rec {
       {
         packageName = "bip39";
         version = "dev";
-        src = vendors/ocaml-bip39;
+        src = tezos/vendors/ocaml-bip39;
       }
       {
         packageName = "ocplib-json-typed";
@@ -56,239 +56,239 @@ rec {
       {
         packageName = "ocplib-resto";
         version = "dev";
-        src = vendors/ocplib-resto/lib_resto;
+        src = tezos/vendors/ocplib-resto/lib_resto;
       }
       {
         packageName = "ocplib-resto-cohttp";
         version = "0.0.0";
-        src = vendors/ocplib-resto/lib_resto-cohttp;
+        src = tezos/vendors/ocplib-resto/lib_resto-cohttp;
       }
       {
         packageName = "ocplib-resto-directory";
         version = "dev";
-        src = vendors/ocplib-resto/lib_resto-directory;
+        src = tezos/vendors/ocplib-resto/lib_resto-directory;
       }
       {
         packageName = "tweetnacl";
         version = "dev";
-        src = vendors/ocaml-tweetnacl;
+        src = tezos/vendors/ocaml-tweetnacl;
       }
       {
         packageName = "blake2";
         version = "dev";
-        src = vendors/ocaml-blake2;
+        src = tezos/vendors/ocaml-blake2;
       }
       {
         packageName = "irmin-leveldb";
         version = "0.0.0";
-        src = vendors/irmin-leveldb;
+        src = tezos/vendors/irmin-leveldb;
       }
       {
         packageName = "secp256k1";
         version = "0.1";
-        src = vendors/ocaml-secp256k1;
+        src = tezos/vendors/ocaml-secp256k1;
       }
       {
         packageName = "ledgerwallet-tezos";
         version = "0.1";
-        src = vendors/ocaml-ledger-wallet;
-        opamFile = vendors/ocaml-ledger-wallet/ledgerwallet-tezos.opam;
+        src = tezos/vendors/ocaml-ledger-wallet;
+        opamFile = tezos/vendors/ocaml-ledger-wallet/ledgerwallet-tezos.opam;
       }
       {
         packageName = "ledgerwallet";
         version = "0.1";
-        src = vendors/ocaml-ledger-wallet;
-        opamFile = vendors/ocaml-ledger-wallet/ledgerwallet.opam;
+        src = tezos/vendors/ocaml-ledger-wallet;
+        opamFile = tezos/vendors/ocaml-ledger-wallet/ledgerwallet.opam;
       }
       {
         packageName = "hidapi";
         version = "0.1";
-        src = vendors/ocaml-hidapi;
+        src = tezos/vendors/ocaml-hidapi;
       }
       {
         packageName = "tezos-clic";
         version = "0.0.0";
-        src = src/lib_clic;
+        src = tezos/src/lib_clic;
       }
       {
         packageName = "tezos-client";
         version = "0.0.0";
-        src = src/bin_client;
+        src = tezos/src/bin_client;
       }
       {
         packageName = "tezos-client-base";
         version = "0.0.0";
-        src = src/lib_client_base;
+        src = tezos/src/lib_client_base;
       }
       {
         packageName = "tezos-client-base-unix";
         version = "0.0.0";
-        src = src/lib_client_base_unix;
+        src = tezos/src/lib_client_base_unix;
       }
       {
         packageName = "tezos-protocol-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_protocol;
-        opamFile = src/proto_alpha/lib_protocol/tezos-protocol-alpha.opam;
+        src = tezos/src/proto_alpha/lib_protocol;
+        opamFile = tezos/src/proto_alpha/lib_protocol/tezos-protocol-alpha.opam;
       }
       {
         packageName = "tezos-baking-alpha-commands";
         version = "0.0.0";
-        src = src/proto_alpha/lib_baking;
-        opamFile = src/proto_alpha/lib_baking/tezos-baking-alpha-commands.opam;
+        src = tezos/src/proto_alpha/lib_baking;
+        opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha-commands.opam;
       }
       {
         packageName = "tezos-baking-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_baking;
-        opamFile = src/proto_alpha/lib_baking/tezos-baking-alpha.opam;
+        src = tezos/src/proto_alpha/lib_baking;
+        opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha.opam;
       }
       {
         packageName = "tezos-client-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_client;
+        src = tezos/src/proto_alpha/lib_client;
       }
       {
         packageName = "tezos-client-alpha-commands";
         version = "0.0.0";
-        src = src/proto_alpha/lib_client_commands;
+        src = tezos/src/proto_alpha/lib_client_commands;
       }
       {
         packageName = "tezos-client-commands";
         version = "0.0.0";
-        src = src/lib_client_commands;
+        src = tezos/src/lib_client_commands;
       }
       {
         packageName = "tezos-client-genesis";
         version = "0.0.0";
-        src = src/proto_genesis/lib_client;
+        src = tezos/src/proto_genesis/lib_client;
       }
       {
         packageName = "tezos-node";
         version = "0.0.0";
-        src = src/bin_node;
+        src = tezos/src/bin_node;
       }
       {
         packageName = "tezos-embedded-protocol-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_protocol;
-        opamFile = src/proto_alpha/lib_protocol/tezos-embedded-protocol-alpha.opam;
+        src = tezos/src/proto_alpha/lib_protocol;
+        opamFile = tezos/src/proto_alpha/lib_protocol/tezos-embedded-protocol-alpha.opam;
       }
       {
         packageName = "tezos-protocol-compiler";
         version = "0.0.0";
-        src = src/lib_protocol_compiler;
+        src = tezos/src/lib_protocol_compiler;
       }
       {
         packageName = "tezos-protocol-updater";
         version = "0.0.0";
-        src = src/lib_protocol_updater;
+        src = tezos/src/lib_protocol_updater;
       }
       {
         packageName = "tezos-storage";
         version = "0.0.0";
-        src = src/lib_storage;
+        src = tezos/src/lib_storage;
       }
       {
         packageName = "tezos-stdlib-unix";
         version = "0.0.0";
-        src = src/lib_stdlib_unix;
+        src = tezos/src/lib_stdlib_unix;
       }
       {
         packageName = "tezos-embedded-protocol-demo";
         version = "0.0.0";
-        src = src/proto_demo/lib_protocol;
-        opamFile = src/proto_demo/lib_protocol/tezos-embedded-protocol-demo.opam;
+        src = tezos/src/proto_demo/lib_protocol;
+        opamFile = tezos/src/proto_demo/lib_protocol/tezos-embedded-protocol-demo.opam;
       }
       {
         packageName = "tezos-base";
         version = "0.0.0";
-        src = src/lib_base;
+        src = tezos/src/lib_base;
       }
       {
         packageName = "tezos-crypto";
         version = "0.0.0";
-        src = src/lib_crypto;
+        src = tezos/src/lib_crypto;
       }
       {
         packageName = "tezos-stdlib";
         version = "0.0.0";
-        src = src/lib_stdlib;
+        src = tezos/src/lib_stdlib;
       }
       {
         packageName = "tezos-shell";
         version = "0.0.0";
-        src = src/lib_shell;
+        src = tezos/src/lib_shell;
       }
       {
         packageName = "tezos-shell-services";
         version = "0.0.0";
-        src = src/lib_shell_services;
+        src = tezos/src/lib_shell_services;
       }
       {
         packageName = "tezos-micheline";
         version = "0.0.0";
-        src = src/lib_micheline;
+        src = tezos/src/lib_micheline;
       }
       {
         packageName = "tezos-error-monad";
         version = "0.0.0";
-        src = src/lib_error_monad;
+        src = tezos/src/lib_error_monad;
       }
       {
         packageName = "tezos-data-encoding";
         version = "0.0.0";
-        src = src/lib_data_encoding;
+        src = tezos/src/lib_data_encoding;
       }
       {
         packageName = "tezos-rpc";
         version = "0.0.0";
-        src = src/lib_rpc;
+        src = tezos/src/lib_rpc;
       }
       {
         packageName = "tezos-rpc-http";
         version = "0.0.0";
-        src = src/lib_rpc_http;
+        src = tezos/src/lib_rpc_http;
       }
       {
         packageName = "tezos-p2p";
         version = "0.0.0";
-        src = src/lib_p2p;
+        src = tezos/src/lib_p2p;
       }
       {
         packageName = "tezos-protocol-environment";
         version = "0.0.0";
-        src = src/lib_protocol_environment;
-        opamFile = src/lib_protocol_environment/tezos-protocol-environment.opam;
+        src = tezos/src/lib_protocol_environment;
+        opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment.opam;
       }
       {
         packageName = "tezos-protocol-environment-shell";
         version = "0.0.0";
-        src = src/lib_protocol_environment;
-        opamFile = src/lib_protocol_environment/tezos-protocol-environment-shell.opam;
+        src = tezos/src/lib_protocol_environment;
+        opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment-shell.opam;
       }
       {
         packageName = "tezos-protocol-genesis";
         version = "0.0.0";
-        src = src/proto_genesis/lib_protocol;
-        opamFile = src/proto_genesis/lib_protocol/tezos-protocol-genesis.opam;
+        src = tezos/src/proto_genesis/lib_protocol;
+        opamFile = tezos/src/proto_genesis/lib_protocol/tezos-protocol-genesis.opam;
       }
       {
         packageName = "tezos-embedded-protocol-genesis";
         version = "0.0.0";
-        src = src/proto_genesis/lib_protocol;
-        opamFile = src/proto_genesis/lib_protocol/tezos-embedded-protocol-genesis.opam;
+        src = tezos/src/proto_genesis/lib_protocol;
+        opamFile = tezos/src/proto_genesis/lib_protocol/tezos-embedded-protocol-genesis.opam;
       }
       {
         packageName = "tezos-protocol-environment-sigs";
         version = "0.0.0";
-        src = src/lib_protocol_environment;
-        opamFile = src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
+        src = tezos/src/lib_protocol_environment;
+        opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
       }
       {
         packageName = "tezos-baker-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/bin_baker;
+        src = tezos/src/proto_alpha/bin_baker;
       }
     ];
     overrides = onOpamSelection ({ self, super }: {
@@ -662,15 +662,15 @@ rec {
       '';
   };
 
-  tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {
+  tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor/tezos-bake-monitor {
     inherit pkgs;
   };
 
-  tezos-loadtest = pkgs.callPackage ./tezos-loadtest {
+  tezos-loadtest = pkgs.callPackage ./tezos-load-testing {
     inherit pkgs;
   };
 
-  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {};
+  tezos-bake-central = pkgs.callPackage ./tezos-bake-monitor/tezos-bake-central {};
 
   # docker-image =
   # let
