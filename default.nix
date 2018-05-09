@@ -45,15 +45,6 @@ rec {
         src = tezos/vendors/ocaml-bip39;
       }
       {
-        packageName = "ocplib-json-typed";
-        version = "dev";
-        src = pkgs.fetchgit {
-          url = "https://github.com/OCamlPro/ocplib-json-typed";
-          rev = "28bb9ec633049eb5a5461ead2d85685a47be81c5";
-          sha256 = "19czgk5pi62kz0gzz73h3p3iq0scz602lk6qhwn1v38sfssh1qwy";
-        };
-      }
-      {
         packageName = "ocplib-resto";
         version = "dev";
         src = tezos/vendors/ocplib-resto/lib_resto;
@@ -69,9 +60,19 @@ rec {
         src = tezos/vendors/ocplib-resto/lib_resto-directory;
       }
       {
-        packageName = "tweetnacl";
+        packageName = "hacl";
         version = "dev";
-        src = tezos/vendors/ocaml-tweetnacl;
+        src = tezos/vendors/ocaml-hacl;
+      }
+      {
+        packageName = "ocplib-json-typed-bson";
+        version = "dev";
+        src = tezos/vendors/ocplib-json-typed/lib_json_typed_bson;
+      }
+      {
+        packageName = "ocplib-json-typed";
+        version = "0.6";
+        src = tezos/vendors/ocplib-json-typed/lib_json_typed;
       }
       {
         packageName = "blake2";
