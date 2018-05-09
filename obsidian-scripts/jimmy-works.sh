@@ -12,10 +12,12 @@ echo "$LOG_FILE contains full transcript, selected portions follow:"
         --argstr time_between_blocks '[1,1]' \
         --argstr max_peer_id 2 || echo "FAILED"
 } 2>&1 | tee $LOG_FILE | grep -i -e ledger -e injected -e client & pid=$!
+
 transcript() {
     printf >&2 'Transcript available in: %s\n' "$LOG_FILE"
 }
 trap transcript SIGINT
+
 while true; do
     sleep 10
     mtime=$(stat -c %Y $LOG_FILE)
