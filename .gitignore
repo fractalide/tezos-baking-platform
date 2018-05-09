@@ -42,3 +42,5 @@ result
 /result-[0-9]*
 frontendJs
 db
+
+LOGS

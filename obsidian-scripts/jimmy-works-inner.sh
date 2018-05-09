@@ -5,9 +5,15 @@ killall tezos-node ||:
 rm -rf sandbox
 mkdir -p sandbox
 
-tezos-sandbox-network.sh
-bootstrap-env.sh
-bootstrap-alphanet.sh
+fail() {
+    echo "FAILURE! FAILURE!"
+    false
+}
+
+tezos-sandbox-network.sh || fail
+sleep 5
+bootstrap-env.sh || fail
+bootstrap-alphanet.sh || fail
 
 monitored-bakers.sh bootstrap0 bootstrap1
 
