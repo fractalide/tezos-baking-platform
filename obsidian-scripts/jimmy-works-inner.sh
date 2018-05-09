@@ -34,7 +34,11 @@ op1=$(attempt tezos-sandbox-client.sh transfer 2000000 from bootstrap0 to my-led
 op2=$(attempt tezos-sandbox-client.sh transfer 2000000 from bootstrap1 to my-ledger |
     extract_operation_id)
 echo $op1 $op2
-sleep 5
+
+tezos-sandbox-client.sh get balance for my-ledger
+tezos-sandbox-client.sh get balance for bootstrap0
+tezos-sandbox-client.sh get balance for bootstrap1
+
 attempt tezos-sandbox-client.sh set delegate for my-ledger to my-ledger
 
 exec tezos-sandbox-client.sh launch daemon my-ledger -B -E -D
