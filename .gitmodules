@@ -16,3 +16,12 @@
 [submodule "obsidian-scripts/ledger/nanos-secure-sdk"]
 	path = obsidian-scripts/ledger/nanos-secure-sdk
 	url = git@github.com:LedgerHQ/nanos-secure-sdk
+[submodule "tezos"]
+	path = tezos
+	url = git@gitlab.com:obsidian.systems/tezos.git
+[submodule "tezos-bake-monitor"]
+	path = tezos-bake-monitor
+	url = git@gitlab.com:obsidian.systems/tezos-bake-monitor.git
+[submodule "tezos-load-testing"]
+	path = tezos-load-testing
+	url = git@gitlab.com:obsidian.systems/tezos-load-testing.git

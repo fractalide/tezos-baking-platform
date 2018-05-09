@@ -42,7 +42,7 @@ rec {
       {
         packageName = "bip39";
         version = "dev";
-        src = vendors/ocaml-bip39;
+        src = tezos/vendors/ocaml-bip39;
       }
       {
         packageName = "ocplib-json-typed";
@@ -56,239 +56,258 @@ rec {
       {
         packageName = "ocplib-resto";
         version = "dev";
-        src = vendors/ocplib-resto/lib_resto;
+        src = tezos/vendors/ocplib-resto/lib_resto;
       }
       {
         packageName = "ocplib-resto-cohttp";
         version = "0.0.0";
-        src = vendors/ocplib-resto/lib_resto-cohttp;
+        src = tezos/vendors/ocplib-resto/lib_resto-cohttp;
       }
       {
         packageName = "ocplib-resto-directory";
         version = "dev";
-        src = vendors/ocplib-resto/lib_resto-directory;
+        src = tezos/vendors/ocplib-resto/lib_resto-directory;
       }
       {
         packageName = "tweetnacl";
         version = "dev";
-        src = vendors/ocaml-tweetnacl;
+        src = tezos/vendors/ocaml-tweetnacl;
       }
       {
         packageName = "blake2";
         version = "dev";
-        src = vendors/ocaml-blake2;
+        src = tezos/vendors/ocaml-blake2;
       }
       {
         packageName = "irmin-leveldb";
         version = "0.0.0";
-        src = vendors/irmin-leveldb;
+        src = tezos/vendors/irmin-leveldb;
       }
       {
         packageName = "secp256k1";
         version = "0.1";
-        src = vendors/ocaml-secp256k1;
+        src = tezos/vendors/ocaml-secp256k1;
       }
       {
         packageName = "ledgerwallet-tezos";
         version = "0.1";
-        src = vendors/ocaml-ledger-wallet;
-        opamFile = vendors/ocaml-ledger-wallet/ledgerwallet-tezos.opam;
+        # src = tezos/vendors/ocaml-ledger-wallet;
+        src = pkgs.fetchgit {
+          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
+          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
+          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
+          fetchSubmodules= true;
+        };
+        opamFile = "ledgerwallet-tezos.opam";
       }
       {
         packageName = "ledgerwallet";
-        version = "0.1";
-        src = vendors/ocaml-ledger-wallet;
-        opamFile = vendors/ocaml-ledger-wallet/ledgerwallet.opam;
+        version = "dev";
+        # src = tezos/vendors/ocaml-ledger-wallet;
+        src = pkgs.fetchgit {
+          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
+          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
+          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
+          fetchSubmodules= true;
+        };
+         opamFile = "ledgerwallet.opam";
       }
+
       {
         packageName = "hidapi";
-        version = "0.1";
-        src = vendors/ocaml-hidapi;
+        version = "dev";
+        # src = tezos/vendors/ocaml-hidapi;
+        src = pkgs.fetchgit {
+          url= "https://github.com/ryantrinkle/ocaml-hidapi";
+          rev= "6d232b19e68a265acbb25d6194caa937cd64ba1f";
+          sha256= "017cnl6w6bggcc3db697xprr881gp3fnrl913mp6dvrns46gj2pa";
+          fetchSubmodules= true;
+        };
       }
       {
         packageName = "tezos-clic";
         version = "0.0.0";
-        src = src/lib_clic;
+        src = tezos/src/lib_clic;
       }
       {
         packageName = "tezos-client";
         version = "0.0.0";
-        src = src/bin_client;
+        src = tezos/src/bin_client;
       }
       {
         packageName = "tezos-client-base";
         version = "0.0.0";
-        src = src/lib_client_base;
+        src = tezos/src/lib_client_base;
       }
       {
         packageName = "tezos-client-base-unix";
         version = "0.0.0";
-        src = src/lib_client_base_unix;
+        src = tezos/src/lib_client_base_unix;
       }
       {
         packageName = "tezos-protocol-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_protocol;
-        opamFile = src/proto_alpha/lib_protocol/tezos-protocol-alpha.opam;
+        src = tezos/src/proto_alpha/lib_protocol;
+        opamFile = tezos/src/proto_alpha/lib_protocol/tezos-protocol-alpha.opam;
       }
       {
         packageName = "tezos-baking-alpha-commands";
         version = "0.0.0";
-        src = src/proto_alpha/lib_baking;
-        opamFile = src/proto_alpha/lib_baking/tezos-baking-alpha-commands.opam;
+        src = tezos/src/proto_alpha/lib_baking;
+        opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha-commands.opam;
       }
       {
         packageName = "tezos-baking-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_baking;
-        opamFile = src/proto_alpha/lib_baking/tezos-baking-alpha.opam;
+        src = tezos/src/proto_alpha/lib_baking;
+        opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha.opam;
       }
       {
         packageName = "tezos-client-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_client;
+        src = tezos/src/proto_alpha/lib_client;
       }
       {
         packageName = "tezos-client-alpha-commands";
         version = "0.0.0";
-        src = src/proto_alpha/lib_client_commands;
+        src = tezos/src/proto_alpha/lib_client_commands;
       }
       {
         packageName = "tezos-client-commands";
         version = "0.0.0";
-        src = src/lib_client_commands;
+        src = tezos/src/lib_client_commands;
       }
       {
         packageName = "tezos-client-genesis";
         version = "0.0.0";
-        src = src/proto_genesis/lib_client;
+        src = tezos/src/proto_genesis/lib_client;
       }
       {
         packageName = "tezos-node";
         version = "0.0.0";
-        src = src/bin_node;
+        src = tezos/src/bin_node;
       }
       {
         packageName = "tezos-embedded-protocol-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/lib_protocol;
-        opamFile = src/proto_alpha/lib_protocol/tezos-embedded-protocol-alpha.opam;
+        src = tezos/src/proto_alpha/lib_protocol;
+        opamFile = tezos/src/proto_alpha/lib_protocol/tezos-embedded-protocol-alpha.opam;
       }
       {
         packageName = "tezos-protocol-compiler";
         version = "0.0.0";
-        src = src/lib_protocol_compiler;
+        src = tezos/src/lib_protocol_compiler;
       }
       {
         packageName = "tezos-protocol-updater";
         version = "0.0.0";
-        src = src/lib_protocol_updater;
+        src = tezos/src/lib_protocol_updater;
       }
       {
         packageName = "tezos-storage";
         version = "0.0.0";
-        src = src/lib_storage;
+        src = tezos/src/lib_storage;
       }
       {
         packageName = "tezos-stdlib-unix";
         version = "0.0.0";
-        src = src/lib_stdlib_unix;
+        src = tezos/src/lib_stdlib_unix;
       }
       {
         packageName = "tezos-embedded-protocol-demo";
         version = "0.0.0";
-        src = src/proto_demo/lib_protocol;
-        opamFile = src/proto_demo/lib_protocol/tezos-embedded-protocol-demo.opam;
+        src = tezos/src/proto_demo/lib_protocol;
+        opamFile = tezos/src/proto_demo/lib_protocol/tezos-embedded-protocol-demo.opam;
       }
       {
         packageName = "tezos-base";
         version = "0.0.0";
-        src = src/lib_base;
+        src = tezos/src/lib_base;
       }
       {
         packageName = "tezos-crypto";
         version = "0.0.0";
-        src = src/lib_crypto;
+        src = tezos/src/lib_crypto;
       }
       {
         packageName = "tezos-stdlib";
         version = "0.0.0";
-        src = src/lib_stdlib;
+        src = tezos/src/lib_stdlib;
       }
       {
         packageName = "tezos-shell";
         version = "0.0.0";
-        src = src/lib_shell;
+        src = tezos/src/lib_shell;
       }
       {
         packageName = "tezos-shell-services";
         version = "0.0.0";
-        src = src/lib_shell_services;
+        src = tezos/src/lib_shell_services;
       }
       {
         packageName = "tezos-micheline";
         version = "0.0.0";
-        src = src/lib_micheline;
+        src = tezos/src/lib_micheline;
       }
       {
         packageName = "tezos-error-monad";
         version = "0.0.0";
-        src = src/lib_error_monad;
+        src = tezos/src/lib_error_monad;
       }
       {
         packageName = "tezos-data-encoding";
         version = "0.0.0";
-        src = src/lib_data_encoding;
+        src = tezos/src/lib_data_encoding;
       }
       {
         packageName = "tezos-rpc";
         version = "0.0.0";
-        src = src/lib_rpc;
+        src = tezos/src/lib_rpc;
       }
       {
         packageName = "tezos-rpc-http";
         version = "0.0.0";
-        src = src/lib_rpc_http;
+        src = tezos/src/lib_rpc_http;
       }
       {
         packageName = "tezos-p2p";
         version = "0.0.0";
-        src = src/lib_p2p;
+        src = tezos/src/lib_p2p;
       }
       {
         packageName = "tezos-protocol-environment";
         version = "0.0.0";
-        src = src/lib_protocol_environment;
-        opamFile = src/lib_protocol_environment/tezos-protocol-environment.opam;
+        src = tezos/src/lib_protocol_environment;
+        opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment.opam;
       }
       {
         packageName = "tezos-protocol-environment-shell";
         version = "0.0.0";
-        src = src/lib_protocol_environment;
-        opamFile = src/lib_protocol_environment/tezos-protocol-environment-shell.opam;
+        src = tezos/src/lib_protocol_environment;
+        opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment-shell.opam;
       }
       {
         packageName = "tezos-protocol-genesis";
         version = "0.0.0";
-        src = src/proto_genesis/lib_protocol;
-        opamFile = src/proto_genesis/lib_protocol/tezos-protocol-genesis.opam;
+        src = tezos/src/proto_genesis/lib_protocol;
+        opamFile = tezos/src/proto_genesis/lib_protocol/tezos-protocol-genesis.opam;
       }
       {
         packageName = "tezos-embedded-protocol-genesis";
         version = "0.0.0";
-        src = src/proto_genesis/lib_protocol;
-        opamFile = src/proto_genesis/lib_protocol/tezos-embedded-protocol-genesis.opam;
+        src = tezos/src/proto_genesis/lib_protocol;
+        opamFile = tezos/src/proto_genesis/lib_protocol/tezos-embedded-protocol-genesis.opam;
       }
       {
         packageName = "tezos-protocol-environment-sigs";
         version = "0.0.0";
-        src = src/lib_protocol_environment;
-        opamFile = src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
+        src = tezos/src/lib_protocol_environment;
+        opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
       }
       {
         packageName = "tezos-baker-alpha";
         version = "0.0.0";
-        src = src/proto_alpha/bin_baker;
+        src = tezos/src/proto_alpha/bin_baker;
       }
     ];
     overrides = onOpamSelection ({ self, super }: {
@@ -414,7 +433,9 @@ rec {
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
-    src = lib.sourceByRegex ./. ["scripts.*" "tezos-loadtest.*"];
+    # src = lib.sourceByRegex ./. ["tezos.scripts.*" "tezos-loadtest.*"];
+    sourceRoot = ".";
+    srcs = [./tezos/scripts  ./tezos-load-testing ];
 
     configurePhase = "true";
     installPhase = "true";
@@ -429,7 +450,8 @@ rec {
         | jq '.time_between_blocks = $tbb' --argjson tbb '${time_between_blocks}' \
         > $out/protocol_parameters.json
 
-      cat < ./tezos-loadtest/config.json \
+      # TODO: Set traders/bakers/nodes
+      cat < ./tezos-load-testing/config.json \
         | jq '._client_exe = $client' --arg client $out/bin/tezos-sandbox-client.sh \
         > $out/loadtest-config.json
 
@@ -473,6 +495,7 @@ rec {
 
       cat > $out/bin/bootstrap-env.sh <<EOF_BOOTSTRAP
       #/usr/bin/env bash
+        set -xe
         bootstrap_secrets=(
           "edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
           "edsk39qAm1fiMjgmPkw1EgQYkMzkJezLNewd7PLNHTkr6w9XA2zdfo"
@@ -481,6 +504,7 @@ rec {
           "edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm"
         )
 
+        $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
           $out/bin/tezos-sandbox-client.sh import unencrypted secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
         done
@@ -507,16 +531,23 @@ rec {
       # CLI flags to do otherwise, as the normal client programs already do.
       cat > $out/bin/tezos-sandbox-client.sh <<EOF_CLIENT
       #!/usr/bin/env bash
+      set -ex
       exec ${client}/bin/tezos-client "--config-file" "$out/client/config" "\$@"
       EOF_CLIENT
 
       # create a wrapper around tezos-node setting arguments for working within the sandbox
       cat > $out/bin/tezos-sandbox-node.sh <<EOF_NODE
       #!/usr/bin/env bash
-      set -x
-      set -e ; nodeid="\$1" ; shift
+      set -xe ; nodeid="\$1" ; shift
 
       node_args=("--config-file=$out/node-\$nodeid/config.json")
+
+      mkdir -p "${datadir}/node-\$nodeid"
+      if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
+        ${node}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+      fi
+
+      # logfile is already redirected by config
       if [ "\$1" == "run" ] ; then
         node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json")
         for peerid in \$(seq 1 ${max_peer_id}) ; do
@@ -527,22 +558,62 @@ rec {
       exec ${node}/bin/tezos-node "\$@" "\''${node_args[@]}"
       EOF_NODE
 
+      # as above, but creates a fragile network where the loss of peer 1 causes a split-brain situation.
+      # theory: a=b=c-d-e=f=g will not lead to a fork, but removing d, having
+      #         a=b=c   e=f=g should produce a fork.
+
+      # sketch:
+      # - create a network that looks like: a=b=c-d-e=f=g
+      # - bake on both sides of the brittle connection
+      # - break the brittle connection
+      # - bake on both hemispheres of the split-brain
+      # - observe height on diverted forks.
+      cat > $out/bin/tezos-sandbox-fragile-node.sh <<EOF_FRAGILENODE
+      #!/usr/bin/env bash
+      set -xe ; nodeid="\$1" ; shift
+
+      node_args=("--config-file=$out/node-\$nodeid/config.json")
+
+      mkdir -p "$out/node-$nodeid"
+      if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
+        ${node}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+      fi
+
+      left_hemisphere=($(seq 2 2 ${max_peer_id}) )
+      right_hemisphere=($(seq 3 2 ${max_peer_id}) )
+      left_peers=( \''${left_hemisphere[@]} 1 )
+      right_peers=( \''${right_hemisphere[@]} 1)
+      fragile_peers=( \$(seq 1 $(( ${max_peer_id} / 2 ))))
+
+      # logfile is already redirected by config
+      if [ "\$1" == "run" ] ; then
+        node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json" "--closed" "--no-bootstrap-peers")
+        if [ "\$nodeid" -eq 1 ] ; then
+          node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${fragile_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        elif [ \$(( "\$nodeid" % 2 )) -eq 0 ] ; then
+          node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${left_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        else
+          node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${right_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        fi
+      fi
+
+      exec ${node}/bin/tezos-node "\$@" "\''${node_args[@]}"
+      EOF_FRAGILENODE
+
+
       cat > $out/bin/tezos-sandbox-network.sh <<EOF_NETWORK
       #!/usr/bin/env bash
-      set -x
+      set -ex
+      dflt_node_exe="$out/bin/tezos-sandbox-node.sh"
+      node_exe="\''${NODE_EXE:-\$dflt_node_exe}"
       for nodeid in \$(seq 1 ${max_peer_id}) ; do
-        mkdir -p "${datadir}/node-\$nodeid"
-        if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
-          $out/bin/tezos-sandbox-node.sh \$nodeid identity generate ${expected_pow}
-        fi
-        # logfile is already redirected by config
-        $out/bin/tezos-sandbox-node.sh \$nodeid run &
+        \$node_exe \$nodeid run &
       done
       EOF_NETWORK
 
       cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
       #!/usr/bin/env bash
-      set -x
+      set -ex
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
         # ${tezos-bake-monitor}/bin/tezos-bake-monitor --port "\$((9800 + bootstrapid))" --rpchost "http://127.0.0.1:\$((18730 + bootstrapid))" -- $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
         $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
@@ -551,7 +622,7 @@ rec {
 
       cat > $out/bin/tezos-sandbox-bootstrap.sh <<EOF_FULLBOOT
       #!/usr/bin/env bash
-      set -x
+      set -ex
       mkdir -p ${datadir}
       if [ ! -f "${datadir}/loadtest-config.json" ] ; then
         cp $out/loadtest-config.json "${datadir}/loadtest-config.json"
@@ -559,6 +630,12 @@ rec {
       fi
 
       $out/bin/tezos-sandbox-network.sh
+
+      until $out/bin/tezos-sandbox-client.sh bootstrapped 2>/dev/null ; do
+        echo -n .
+        sleep 1
+      done
+
       $out/bin/bootstrap-env.sh
       $out/bin/bootstrap-alphanet.sh
       EOF_FULLBOOT
@@ -581,17 +658,24 @@ rec {
 
       cat > $out/bin/tezos-sandbox-theworks.sh <<EOF_THEWORKS
       #!/usr/bin/env bash
-      set -x
+      set -ex
       $out/bin/tezos-sandbox-bootstrap.sh
-      sleep 7
 
       $out/bin/monitored-bakers.sh bootstrap0 bootstrap1 bootstrap2 bootstrap3 bootstrap4
 
       # don't start the load test until some progress has been made by the bootstrap bakers.
-      while [ 3 -gt "\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' | jq '.level')" ] ; do sleep 1 ; done
+      while true ; do
+        blockhead="\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' 2>/dev/null)"
+        blockhead_ok=\$?
+        if [ \$blockhead_ok -eq 0 -a 3 -le "\$(jq '.level' <<< "\$blockhead")" ] ; then
+          break
+        else
+          sleep 1
+        fi
+      done
 
       # echo "Generating transactions.  (press ^C at any time)"
-      # ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
+      ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
 
       chmod +x $out/bin/*.sh
@@ -599,15 +683,54 @@ rec {
       '';
   };
 
-  tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor {
+  tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor/tezos-bake-monitor {
     inherit pkgs;
   };
 
-  tezos-loadtest = pkgs.callPackage ./tezos-loadtest {
+  tezos-loadtest = pkgs.callPackage ./tezos-load-testing {
     inherit pkgs;
   };
 
-  tezos-bake-central = pkgs.callPackage ./tezos-bake-central {};
+  tezos-bake-central = pkgs.callPackage ./tezos-bake-monitor/tezos-bake-central {};
+
+  # docker-image =
+  # let
+  #   pkgs = (import <nixpkgs> {});
+  #   mySandbox = sandbox-env {
+  #       expected_pow = "20";
+  #       datadir = "./sandbox";
+  #       max_peer_id = "9";
+  #       expected_connections = "3";
+  #       time_between_blocks = "[5, 5]";
+  #     };
+  # in pkgs.dockerTools.buildImage {
+  #   name = "tezos";
+  #   contents = [
+  #     mySandbox
+  #     node
+  #     client
+  #     tezos-bake-monitor
+  #     tezos-loadtest
+  #     pkgs.jq
+  #   ];
+  #   keepContentsDirlinks = true;
+  #   config = {
+  #     Env = [
+  #       # When shell=true, mesos invokes "sh -c '<cmd>'", so make sure "sh" is
+  #       # on the PATH.
+  #       ("PATH=" + builtins.concatStringsSep(":")([
+  #         "${pkgs.stdenv.shellPackage}/bin"
+  #         "${pkgs.coreutils}/bin"
+  #         "${node}/bin"
+  #         "${client}/bin"
+  #         "${mySandbox}/bin"
+  #         "${pkgs.jq}/bin"
+  #         ]))
+  #     ];
+  #     # Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
+  #     Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
+  #   };
+  # };
 
 }
 
