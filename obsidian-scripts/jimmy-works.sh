@@ -21,7 +21,8 @@ while true; do
         printf >&2 '\e[31mERROR: \e[0mBaking has stalled out. Please re-run.\n'
     fi
     if ! kill -0 $pid; then
-        printf >&2 '\e[31mERROR: \e[0mjimmy-works-inner.sh script failed. Please examine transcript '"$LOG_FILE"
+        printf >&2 '\e[31mERROR: \e[0mjimmy-works-inner.sh script failed. '
+        printf >&2 'Please examine transcript %s\n' "$LOG_FILE"
         false
     fi
 done
