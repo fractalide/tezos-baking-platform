@@ -49,8 +49,8 @@ rec {
         version = "dev";
         src = pkgs.fetchgit {
           url = "https://github.com/OCamlPro/ocplib-json-typed";
-          rev = "28bb9ec633049eb5a5461ead2d85685a47be81c5";
-          sha256 = "19czgk5pi62kz0gzz73h3p3iq0scz602lk6qhwn1v38sfssh1qwy";
+          rev = "89d8ee7f1a81eeb29bb30f7e83fd24a13962e4fb";
+          sha256 = "1g66nsds3jkzpbp2vhzi3irffrrck2sadf1zffzbyqpmfxyq9w7a";
         };
       }
       {
