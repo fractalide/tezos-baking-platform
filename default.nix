@@ -46,12 +46,13 @@ rec {
       }
       {
         packageName = "ocplib-json-typed";
-        version = "dev";
-        src = pkgs.fetchgit {
-          url = "https://github.com/OCamlPro/ocplib-json-typed";
-          rev = "89d8ee7f1a81eeb29bb30f7e83fd24a13962e4fb";
-          sha256 = "1g66nsds3jkzpbp2vhzi3irffrrck2sadf1zffzbyqpmfxyq9w7a";
-        };
+        version = "0.6";
+        src = tezos/vendors/ocplib-json-typed/lib_json_typed;
+      }
+      {
+        packageName = "ocplib-json-typed-bson";
+        version = "0.6";
+        src = tezos/vendors/ocplib-json-typed/lib_json_typed_bson;
       }
       {
         packageName = "ocplib-resto";
