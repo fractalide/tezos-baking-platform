@@ -37,6 +37,7 @@ echo $op1 $op2
 
 attempt tezos-sandbox-client.sh transfer 1 from my-ledger to bootstrap0
 attempt tezos-sandbox-client.sh set delegate for my-ledger to my-ledger
+attempt ledger/reset.sh 00000000 # Reset high water mark
 
 exec tezos-sandbox-client.sh launch daemon my-ledger -B -E -D
 #exec tezos-bake-monitor --port 9803 --rpchost 127.0.0.1:18733 --client `which tezos-sandbox-client.sh` --identity my-ledger
