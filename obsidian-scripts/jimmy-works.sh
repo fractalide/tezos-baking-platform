@@ -14,6 +14,9 @@ echo "$LOG_FILE contains full transcript, selected portions follow:"
 } 2>&1 | tee $LOG_FILE | grep -i -e ledger -e injected -e client & pid=$!
 
 transcript() {
+    kill $pid || :
+    ps aux | grep $LOG_FILE | awk '{ print $2 }' | xargs kill || :
+    sleep 1
     printf >&2 'Transcript available in: %s\n' "$LOG_FILE"
 }
 trap transcript SIGINT
