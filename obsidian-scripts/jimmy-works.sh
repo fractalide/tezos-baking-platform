@@ -18,7 +18,7 @@ transcript() {
     sleep 1
     printf >&2 'Transcript available in: %s\n' "$LOG_FILE"
 }
-trap transcript SIGINT
+trap transcript INT
 
 while true; do
     sleep 10

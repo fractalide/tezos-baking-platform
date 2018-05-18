@@ -91,27 +91,15 @@ rec {
       }
       {
         packageName = "ledgerwallet-tezos";
-        version = "0.1";
-        # src = tezos/vendors/ocaml-ledger-wallet;
-        src = pkgs.fetchgit {
-          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
-          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
-          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
-          fetchSubmodules= true;
-        };
+        version = "dev";
+        src = tezos/vendors/ocaml-ledger-wallet;
         opamFile = "ledgerwallet-tezos.opam";
       }
       {
         packageName = "ledgerwallet";
         version = "dev";
-        # src = tezos/vendors/ocaml-ledger-wallet;
-        src = pkgs.fetchgit {
-          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
-          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
-          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
-          fetchSubmodules= true;
-        };
-         opamFile = "ledgerwallet.opam";
+        src = tezos/vendors/ocaml-ledger-wallet;
+        opamFile = "ledgerwallet.opam";
       }
 
       {
