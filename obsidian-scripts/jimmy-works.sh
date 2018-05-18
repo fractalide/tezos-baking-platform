@@ -14,11 +14,16 @@ echo "$LOG_FILE contains full transcript, selected portions follow:"
 } 2>&1 | tee $LOG_FILE | grep -i -e ledger -e injected -e client & pid=$!
 
 transcript() {
-    kill $pid || :
     sleep 1
     printf >&2 'Transcript available in: %s\n' "$LOG_FILE"
 }
-trap transcript INT
+
+interrupted() {
+    kill $pid || :
+    transcript
+}
+
+trap interrupted INT
 
 while true; do
     sleep 10
