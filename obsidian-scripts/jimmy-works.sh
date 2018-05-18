@@ -15,7 +15,6 @@ echo "$LOG_FILE contains full transcript, selected portions follow:"
 
 transcript() {
     kill $pid || :
-    ps aux | grep $LOG_FILE | awk '{ print $2 }' | xargs kill || :
     sleep 1
     printf >&2 'Transcript available in: %s\n' "$LOG_FILE"
 }
