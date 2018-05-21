@@ -616,8 +616,7 @@ rec {
       #!/usr/bin/env bash
       set -ex
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
-        # ${tezos-bake-monitor}/bin/tezos-bake-monitor --port "\$((9800 + bootstrapid))" --rpchost "http://127.0.0.1:\$((18730 + bootstrapid))" -- $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
-        $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D -M --monitor-port \$((17730+\$bootstrapid)) >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
       done
       EOF_BOOTBAKE
 
@@ -648,7 +647,7 @@ rec {
 
       for i in \$(seq 1 "\$#") ; do
           echo "LAUNCH BAKER:" "\''${!i}"
-          tezos-bake-monitor --port \$((9800 + i)) --rpchost 127.0.0.1:\$(((i - 1) % ${max_peer_id} + 18731)) --client $out/bin/tezos-sandbox-client.sh --identity "\''${!i}" & pid=\$!
+          $out/bin/tezos-sandbox-client.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) launch daemon "\''${!i}" -B -E -D -M --monitor-port \$((17730+\$i)) >${datadir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
           sleep 1
           if ! kill -0 \$pid; then
               echo >&2 "Problem launching tezos-bake-monitor: \$pid"
