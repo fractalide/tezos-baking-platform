@@ -8,9 +8,8 @@ echo $(pwd)/$LOG_FILE
 echo "$LOG_FILE contains full transcript, selected portions follow:"
 {
     set -eux
-    nix-shell -A sandbox --run obsidian-scripts/jimmy-works-inner.sh \
-        --argstr time_between_blocks '[1,1]' \
-        --argstr max_peer_id 2 || echo "FAILED"
+    obsidian-scripts/jimmy-sandbox.sh --run obsidian-scripts/jimmy-works-inner.sh ||
+        echo "FAILED!"
 } 2>&1 | tee $LOG_FILE | grep -i -e ledger -e injected -e client & pid=$!
 
 transcript() {

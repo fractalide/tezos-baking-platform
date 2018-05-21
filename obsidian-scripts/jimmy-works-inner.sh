@@ -1,19 +1,9 @@
 #!/usr/bin/env bash
 set -eux
-killall tezos-client || :
-killall tezos-node ||:
-rm -rf sandbox
-mkdir -p sandbox
 
-fail() {
-    echo "FAILURE! FAILURE!"
-    false
-}
-
-tezos-sandbox-network.sh || fail
-sleep 5
-bootstrap-env.sh || fail
-bootstrap-alphanet.sh || fail
+if [ "X${1:-}" != "Xexisting" ]; then
+    obsidian-scripts/jimmy-sandbox-setup.sh
+fi
 
 monitored-bakers.sh bootstrap0 bootstrap1
 
