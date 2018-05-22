@@ -7,7 +7,7 @@ cd "$DIR"
 {
     echo -n 8006810004
     if [ "${1:-}X" = X ]; then
-        cat
+        echo "00000000"
     else
         echo "$1"
     fi
