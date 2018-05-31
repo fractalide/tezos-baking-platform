@@ -13,12 +13,7 @@ set -eux
 cd ledger-app
 export BOLOS_SDK=$BOLOS_SDK
 export BOLOS_ENV=$BOLOS_ENV
+export BAKING_APP=${BAKING_APP:-}
 make clean
 make
-mv bin/app.hex generic.hex
-mv bin/app.elf generic.elf
-export BAKING_APP=Y
-make clean
-make
-mv generic.* bin/
 EOF
