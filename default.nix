@@ -677,6 +677,31 @@ rec {
       # echo "Generating transactions.  (press ^C at any time)"
       ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
+      cat > $out/bin/tezos-sandbox-bake-monitor.sh <<EOF_BAKEMONITOR
+      #!/usr/bin/env bash
+      set -ex
+
+      mkdir -p ${datadir}/bake-monitor/config
+      mkdir -p ${datadir}/bake-monitor/exe-config
+
+
+      # TODO: these probably shouldn't be here, make it configurable from UI.
+      if [ ! -f ${datadir}/bake-monitor/config/nodes ] ; then
+        printf '%s' '[]' > ${datadir}/bake-monitor/config/nodes
+      fi
+      if [ ! -f ${datadir}/bake-monitor/config/email ] ; then
+        printf '%s' '["localhost","SMTPProtocol_Plain",2525,"username","passwd"]' > ${datadir}/bake-monitor/config/email
+      fi
+
+      # TODO: this more or less does need to be here, but it should really be done by the container setup.
+      if [ ! -f ${datadir}/bake-monitor/exe-config/route ] ; then
+        cat <<<'["http:","localhost",":8000"]' > ${datadir}/bake-monitor/exe-config/route
+      fi
+
+      cd ${datadir}/bake-monitor
+      ln -sft . "${tezos-bake-central}"/*
+      exec ./backend
+      EOF_BAKEMONITOR
 
       chmod +x $out/bin/*.sh
 
