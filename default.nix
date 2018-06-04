@@ -141,6 +141,18 @@ rec {
         src = tezos/src/lib_client_base;
       }
       {
+        packageName = "tezos-signer-backends";
+        version = "0.0.0";
+        src = tezos/src/lib_signer_backends;
+        opamFile = tezos/src/lib_signer_backends/tezos-signer-backends.opam;
+      }
+      {
+        packageName = "tezos-signer-services";
+        version = "0.0.0";
+        src = tezos/src/lib_signer_services;
+        opamFile = tezos/src/lib_signer_services/tezos-signer-services.opam;
+      }
+      {
         packageName = "tezos-client-base-unix";
         version = "0.0.0";
         src = tezos/src/lib_client_base_unix;
@@ -507,10 +519,10 @@ rec {
 
         $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
-          $out/bin/tezos-sandbox-client.sh import unencrypted secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
+          $out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i unencrypted:"\''${bootstrap_secrets[i]}"
         done
 
-        $out/bin/tezos-sandbox-client.sh import unencrypted secret key dictator "edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
+        $out/bin/tezos-sandbox-client.sh import secret key dictator unencrypted:"edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
         cp $out/protocol_parameters.json "${datadir}"
       EOF_BOOTSTRAP
 
