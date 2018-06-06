@@ -727,24 +727,25 @@ rec {
         expected_connections = "3";
         time_between_blocks = "[5, 5]";
     };
-    dockerWorkspace = pkgs.stdenv.mkDerivation {
-      srcs = null;
-      buildPhase = ''
-        mkdir -p /var
-      '';
-    };
     bakeCentralSetupScript = pkgs.writeScript "dockersetup.sh" ''
       #!${pkgs.bash}/bin/bash
       set -ex
 
-      mkdir -p    ./var/run/bake-monitor
-      chown 99:99 ./var/run/bake-monitor
+      ${pkgs.dockerTools.shadowSetup}
+      echo 'nobody:x:99:99:Nobody:/:/sbin/nologin' >> /etc/passwd
+      echo 'nobody:*:17416:0:99999:7:::'           >> /etc/shadow
+      echo 'nobody:x:99:'                          >> /etc/group
+      echo 'nobody:::'                             >> /etc/gshadow
+
+      mkdir -p    /var/run/bake-monitor
+      chown 99:99 /var/run/bake-monitor
     '';
     bakeCentralEntrypoint = pkgs.writeScript "entrypoint.sh" ''
       #!${pkgs.bash}/bin/bash
       set -ex
 
-
+      mkdir -p /var/run/bake-monitor/config
+      mkdir -p /var/run/bake-monitor/exe-config
 
       # TODO: these probably shouldn't be here, make it configurable from UI.
       if [ ! -f /var/run/bake-monitor/config/nodes ] ; then
@@ -756,7 +757,7 @@ rec {
 
       # TODO: this more or less does need to be here, but it should really be done by the container setup.
       if [ ! -f /var/run/bake-monitor/exe-config/route ] ; then
-        cat <<<'["http:","localhost",":8000"]' > /var/run/bake-monitor/exe-config/route
+        printf '%s' '["http:","localhost",":8000"]' > /var/run/bake-monitor/exe-config/route
       fi
 
       cd /var/run/bake-monitor
@@ -776,7 +777,7 @@ rec {
       # tezos-loadtest
       # pkgs.jq
     ];
-    extraCommands = bakeCentralSetupScript;
+    runAsRoot = bakeCentralSetupScript;
     keepContentsDirlinks = true;
     config = {
       Env = [
