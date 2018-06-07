@@ -1,8 +1,8 @@
 { pkgs ?  import ((import <nixpkgs> {}).fetchFromGitHub {
     owner = "NixOS";
     repo = "nixpkgs";
-    rev = "b6ddb9913f2b8206837e0f137db907bdefb9275e";
-    sha256 = "1yjbd5jhjgirv7ki0sms1x13dqyjzg0rpb7n67m6ik61fmpq0nfw";
+    rev = "8f374ba6312f0204119fe71f321664fd8752a133";
+    sha256 = "0qa8k81vlkkad2jd9jw8w50pss1jzw03vj6yz8x856ndiqc7zhg9";
   }) {}
 }:
 
@@ -507,10 +507,10 @@ rec {
 
         $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
-          $out/bin/tezos-sandbox-client.sh import unencrypted secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
+          $out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
         done
 
-        $out/bin/tezos-sandbox-client.sh import unencrypted secret key dictator "edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
+        $out/bin/tezos-sandbox-client.sh import secret key dictator "edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
         cp $out/protocol_parameters.json "${datadir}"
       EOF_BOOTSTRAP
 
@@ -677,6 +677,31 @@ rec {
       # echo "Generating transactions.  (press ^C at any time)"
       ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
+      cat > $out/bin/tezos-sandbox-bake-monitor.sh <<EOF_BAKEMONITOR
+      #!/usr/bin/env bash
+      set -ex
+
+      mkdir -p ${datadir}/bake-monitor/config
+      mkdir -p ${datadir}/bake-monitor/exe-config
+
+
+      # TODO: these probably shouldn't be here, make it configurable from UI.
+      if [ ! -f ${datadir}/bake-monitor/config/nodes ] ; then
+        printf '%s' '[]' > ${datadir}/bake-monitor/config/nodes
+      fi
+      if [ ! -f ${datadir}/bake-monitor/config/email ] ; then
+        printf '%s' '["localhost","SMTPProtocol_Plain",2525,"username","passwd"]' > ${datadir}/bake-monitor/config/email
+      fi
+
+      # TODO: this more or less does need to be here, but it should really be done by the container setup.
+      if [ ! -f ${datadir}/bake-monitor/exe-config/route ] ; then
+        cat <<<'["http:","localhost",":8000"]' > ${datadir}/bake-monitor/exe-config/route
+      fi
+
+      cd ${datadir}/bake-monitor
+      ln -sft . "${tezos-bake-central}"/*
+      exec ./backend
+      EOF_BAKEMONITOR
 
       chmod +x $out/bin/*.sh
 
@@ -693,44 +718,83 @@ rec {
 
   tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central).server {hostName = "hostname";};
 
-  # docker-image =
-  # let
-  #   pkgs = (import <nixpkgs> {});
-  #   mySandbox = sandbox-env {
-  #       expected_pow = "20";
-  #       datadir = "./sandbox";
-  #       max_peer_id = "9";
-  #       expected_connections = "3";
-  #       time_between_blocks = "[5, 5]";
-  #     };
-  # in pkgs.dockerTools.buildImage {
-  #   name = "tezos";
-  #   contents = [
-  #     mySandbox
-  #     node
-  #     client
-  #     tezos-bake-monitor
-  #     tezos-loadtest
-  #     pkgs.jq
-  #   ];
-  #   keepContentsDirlinks = true;
-  #   config = {
-  #     Env = [
-  #       # When shell=true, mesos invokes "sh -c '<cmd>'", so make sure "sh" is
-  #       # on the PATH.
-  #       ("PATH=" + builtins.concatStringsSep(":")([
-  #         "${pkgs.stdenv.shellPackage}/bin"
-  #         "${pkgs.coreutils}/bin"
-  #         "${node}/bin"
-  #         "${client}/bin"
-  #         "${mySandbox}/bin"
-  #         "${pkgs.jq}/bin"
-  #         ]))
-  #     ];
-  #     # Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
-  #     Cmd = [ "${mySandbox}/bin/tezos-sandbox-theworks.sh" ];
-  #   };
-  # };
+  bake-central-docker =
+  let
+    mySandbox = sandbox-env {
+        expected_pow = "20";
+        datadir = "./bakecentral";
+        max_peer_id = "9";
+        expected_connections = "3";
+        time_between_blocks = "[5, 5]";
+    };
+    bakeCentralSetupScript = pkgs.writeScript "dockersetup.sh" ''
+      #!${pkgs.bash}/bin/bash
+      set -ex
+
+      ${pkgs.dockerTools.shadowSetup}
+      echo 'nobody:x:99:99:Nobody:/:/sbin/nologin' >> /etc/passwd
+      echo 'nobody:*:17416:0:99999:7:::'           >> /etc/shadow
+      echo 'nobody:x:99:'                          >> /etc/group
+      echo 'nobody:::'                             >> /etc/gshadow
+
+      mkdir -p    /var/run/bake-monitor
+      chown 99:99 /var/run/bake-monitor
+    '';
+    bakeCentralEntrypoint = pkgs.writeScript "entrypoint.sh" ''
+      #!${pkgs.bash}/bin/bash
+      set -ex
+
+      mkdir -p /var/run/bake-monitor/config
+      mkdir -p /var/run/bake-monitor/exe-config
+
+      # TODO: these probably shouldn't be here, make it configurable from UI.
+      if [ ! -f /var/run/bake-monitor/config/nodes ] ; then
+        printf '%s' '[]' > /var/run/bake-monitor/config/nodes
+      fi
+      if [ ! -f /var/run/bake-monitor/config/email ] ; then
+        printf '%s' '["localhost","SMTPProtocol_Plain",2525,"username","passwd"]' > /var/run/bake-monitor/config/email
+      fi
+
+      # TODO: this more or less does need to be here, but it should really be done by the container setup.
+      if [ ! -f /var/run/bake-monitor/exe-config/route ] ; then
+        printf '%s' '["http:","localhost",":8000"]' > /var/run/bake-monitor/exe-config/route
+      fi
+
+      cd /var/run/bake-monitor
+      ln -sft . "${tezos-bake-central}"/*
+      exec ./backend
+      '';
+
+  in pkgs.dockerTools.buildImage {
+    name = "tezos";
+    contents = [
+      # mySandbox
+      # node
+      # client
+      pkgs.bash
+      pkgs.postgresql95
+      tezos-bake-central
+      # tezos-loadtest
+      # pkgs.jq
+    ];
+    runAsRoot = bakeCentralSetupScript;
+    keepContentsDirlinks = true;
+    config = {
+      Env = [
+        ("PATH=" + builtins.concatStringsSep(":")([
+          "${pkgs.stdenv.shellPackage}/bin"
+          "${pkgs.coreutils}/bin"
+          # "${node}/bin"
+          # "${client}/bin"
+          # "${mySandbox}/bin"
+          # "${pkgs.jq}/bin"
+          ]))
+      ];
+      Expose = 8000;
+      Entrypoint = [ bakeCentralEntrypoint ];
+      User = "99:99";
+    };
+  };
 
 }
 
