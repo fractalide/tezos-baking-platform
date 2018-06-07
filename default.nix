@@ -463,7 +463,7 @@ rec {
         declare -a node_args
         node_args=("--config-file=$out/node-$nodeid/config.json"
             "--data-dir=${datadir}/node-$nodeid"
-            "--rpc-addr=127.0.0.1:$((18730 + nodeid))"
+            "--rpc-addr=0.0.0.0:$((18730 + nodeid))"
             "--net-addr=127.0.0.1:$((19730 + nodeid))"
             "--expected-pow=${expected_pow}"
             "--closed"
@@ -507,10 +507,10 @@ rec {
 
         $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
-          $out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
+          $out/bin/tezos-sandbox-client.sh import unencrypted secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
         done
 
-        $out/bin/tezos-sandbox-client.sh import secret key dictator "edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
+        $out/bin/tezos-sandbox-client.sh import unencrypted secret key dictator "edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
         cp $out/protocol_parameters.json "${datadir}"
       EOF_BOOTSTRAP
 
@@ -716,7 +716,7 @@ rec {
     inherit pkgs;
   };
 
-  tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central).server {hostName = "hostname";};
+  tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central).exe;
 
   bake-central-docker =
   let
@@ -744,24 +744,25 @@ rec {
       #!${pkgs.bash}/bin/bash
       set -ex
 
+      mkdir -p  /var/run/bake-monitor
+      ln -sft /var/run/bake-monitor "${tezos-bake-central}"/*
+      rm /var/run/bake-monitor/config
       mkdir -p /var/run/bake-monitor/config
-      mkdir -p /var/run/bake-monitor/exe-config
 
       # TODO: these probably shouldn't be here, make it configurable from UI.
       if [ ! -f /var/run/bake-monitor/config/nodes ] ; then
-        printf '%s' '[]' > /var/run/bake-monitor/config/nodes
+        printf '%s' '[{"_node_address" : "http://172.17.0.1:18731"}]' > /var/run/bake-monitor/config/nodes
       fi
       if [ ! -f /var/run/bake-monitor/config/email ] ; then
         printf '%s' '["localhost","SMTPProtocol_Plain",2525,"username","passwd"]' > /var/run/bake-monitor/config/email
       fi
 
       # TODO: this more or less does need to be here, but it should really be done by the container setup.
-      if [ ! -f /var/run/bake-monitor/exe-config/route ] ; then
-        printf '%s' '["http:","localhost",":8000"]' > /var/run/bake-monitor/exe-config/route
+      if [ ! -f /var/run/bake-monitor/config/route ] ; then
+        printf '%s' '["http:","localhost",":8000"]' > /var/run/bake-monitor/config/route
       fi
 
       cd /var/run/bake-monitor
-      ln -sft . "${tezos-bake-central}"/*
       exec ./backend
       '';
 
