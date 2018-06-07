@@ -691,7 +691,7 @@ rec {
     inherit pkgs;
   };
 
-  tezos-bake-central = pkgs.callPackage ./tezos-bake-monitor/tezos-bake-central {};
+  tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central).server {hostName = "hostname";};
 
   # docker-image =
   # let
