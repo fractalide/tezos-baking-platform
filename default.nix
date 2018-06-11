@@ -34,7 +34,7 @@ rec {
   opamSolution = opam2nix.buildOpamPackages {
     ocamlAttr = "ocamlPackages_latest.ocaml";
     specs = [
-      { name = "jbuilder"; constraint = "=1.0+beta19.1"; }
+      { name = "jbuilder"; }
       { name = "ocb-stubblr"; }
       { name = "cpuid"; }
     ];
@@ -92,26 +92,14 @@ rec {
       {
         packageName = "ledgerwallet-tezos";
         version = "0.1";
-        # src = tezos/vendors/ocaml-ledger-wallet;
-        src = pkgs.fetchgit {
-          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
-          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
-          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
-          fetchSubmodules= true;
-        };
+        src = tezos/vendors/ocaml-ledger-wallet;
         opamFile = "ledgerwallet-tezos.opam";
       }
       {
         packageName = "ledgerwallet";
         version = "dev";
-        # src = tezos/vendors/ocaml-ledger-wallet;
-        src = pkgs.fetchgit {
-          url= "https://github.com/obsidiansystems/ocaml-ledger-wallet";
-          rev= "4cf8ff374b4d7fa5a8a925877e73195a9b0d5ac1";
-          sha256= "0jxrz1qx1dnh8bz2ay4xd444r8y0f21x48ha2mxgiw4424259l8d";
-          fetchSubmodules= true;
-        };
-         opamFile = "ledgerwallet.opam";
+        src = tezos/vendors/ocaml-ledger-wallet;
+        opamFile = "ledgerwallet.opam";
       }
 
       {
@@ -119,9 +107,9 @@ rec {
         version = "dev";
         # src = tezos/vendors/ocaml-hidapi;
         src = pkgs.fetchgit {
-          url= "https://github.com/ryantrinkle/ocaml-hidapi";
-          rev= "6d232b19e68a265acbb25d6194caa937cd64ba1f";
-          sha256= "017cnl6w6bggcc3db697xprr881gp3fnrl913mp6dvrns46gj2pa";
+          url= "https://github.com/vbmithr/ocaml-hidapi";
+          rev= "21c4a1ecd16542e89547f99e34de8441bc913611";
+          sha256= "0rpi6fs6mr5kl58pjxpllds71s4nyfskjikpl333y9bcdaimd3r6";
           fetchSubmodules= true;
         };
       }
@@ -415,7 +403,7 @@ rec {
       , datadir ? "./sandbox"
       , max_peer_id ? "9"
       , expected_connections ? "3"
-      , time_between_blocks ? "[5, 5]"
+      , time_between_blocks ? ''["5", "5"]''
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox-sandbox";
@@ -478,7 +466,7 @@ rec {
             "--rpc-addr=127.0.0.1:$((18730 + nodeid))"
             "--net-addr=127.0.0.1:$((19730 + nodeid))"
             "--expected-pow=${expected_pow}"
-            "--closed"
+            "--private-mode"
             "--no-bootstrap-peers"
             "--connections=${expected_connections}"
             "--log-output=${datadir}/node-$nodeid.log"
@@ -600,7 +588,7 @@ rec {
 
       # logfile is already redirected by config
       if [ "\$1" == "run" ] ; then
-        node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json" "--closed" "--no-bootstrap-peers")
+        node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json" "--private-mode" "--no-bootstrap-peers")
         if [ "\$nodeid" -eq 1 ] ; then
           node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${fragile_peers[@]}" ; do echo \$((19730 + i)) ; done)))
         elif [ \$(( "\$nodeid" % 2 )) -eq 0 ] ; then

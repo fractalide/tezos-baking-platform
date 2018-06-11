@@ -8,7 +8,7 @@ fi
 
 monitored-bakers.sh bootstrap0 bootstrap1
 
-tezos-sandbox-client.sh import secret key my-ledger ledger://tz1ZeBds7Eg8XKyx1isF1DMrMESWvwJSfDbw/"44'/1729'"
+tezos-sandbox-client.sh import secret key my-ledger ledger://tz1VasatP7zmHDxPeBn97YoSFowXLdsBAdW9/"44'/1729'"
 attempt() {
     while ! "$@"; do
         echo 'Failed'
@@ -21,9 +21,10 @@ extract_operation_id() {
 }
 
 attempt tezos-sandbox-client.sh transfer 2000000 from bootstrap0 to my-ledger
-attempt tezos-sandbox-client.sh transfer 2000000 from bootstrap1 to my-ledger
+attempt tezos-sandbox-client.sh transfer 2000001 from bootstrap1 to my-ledger
 echo "Switch ledger to transaction app"
 attempt tezos-sandbox-client.sh set delegate for my-ledger to my-ledger
+attempt tezos-sandbox-client.sh transfer 1 from my-ledger to bootstrap1
 echo "Switch ledger to baking app"
 attempt ledger/reset.sh 00000000 # Reset high water mark
 
