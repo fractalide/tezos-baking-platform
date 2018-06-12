@@ -2,11 +2,11 @@
 set -eux
 
 killall tezos-client || :
-killall tezos-node ||:
+killall tezos-node || :
 rm -rf sandbox
 
 mkdir -p sandbox
-tezos-sandbox-network.sh || fail
+tezos-sandbox-network.sh
 sleep 5
-bootstrap-env.sh || fail
-bootstrap-alphanet.sh || fail
+bootstrap-env.sh
+bootstrap-alphanet.sh
