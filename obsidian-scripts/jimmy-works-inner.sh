@@ -8,7 +8,7 @@ fi
 
 monitored-bakers.sh bootstrap0 bootstrap1
 
-tezos-sandbox-client.sh import secret key my-ledger ledger://tz1R8onJjiGBhsMWwaEM5QNZRSFhegupPWfd/"44'/1729'"
+tezos-sandbox-client.sh import secret key my-ledger ledger://tz1VasatP7zmHDxPeBn97YoSFowXLdsBAdW9/"44'/1729'"
 attempt() {
     while ! "$@"; do
         echo 'Failed'
