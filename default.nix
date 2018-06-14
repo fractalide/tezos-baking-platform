@@ -716,7 +716,7 @@ rec {
     inherit pkgs;
   };
 
-  tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central).exe;
+  tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central {}).exe;
 
   bake-central-docker =
   let
