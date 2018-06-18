@@ -6,7 +6,7 @@ if [ "X${1:-}" != "Xexisting" ]; then
     obsidian-scripts/jimmy-sandbox-setup.sh
 fi
 
-monitored-bakers.sh bootstrap0 bootstrap1
+bootstrap-baking.sh
 
 tezos-sandbox-client.sh import secret key my-ledger ledger://tz1VasatP7zmHDxPeBn97YoSFowXLdsBAdW9/"44'/1729'"
 attempt() {
