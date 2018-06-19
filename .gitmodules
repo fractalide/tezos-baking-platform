@@ -22,3 +22,6 @@
 [submodule "tezos-load-testing"]
 	path = tezos-load-testing
 	url = git@gitlab.com:obsidian.systems/tezos-load-testing.git
+[submodule "opam2nix"]
+	path = opam2nix
+	url = https://github.com/obsidiansystems/opam2nix
