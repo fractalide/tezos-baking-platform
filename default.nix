@@ -347,7 +347,7 @@ rec {
       , datadir ? "./sandbox"
       , max_peer_id ? "9"
       , expected_connections ? "3"
-      , time_between_blocks ? "[5, 5]"
+      , time_between_blocks ? ''["5"]''
       # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox-sandbox";
@@ -375,7 +375,6 @@ rec {
       , max_peer_id
       , expected_connections
       , time_between_blocks
-      # TODO: protocol parameters, especially time_between_blocks
   } : pkgs.stdenv.mkDerivation {
     name = "tezos-sandbox";
     # src = lib.sourceByRegex ./. ["tezos.scripts.*" "tezos-loadtest.*"];
@@ -410,7 +409,7 @@ rec {
             "--rpc-addr=0.0.0.0:$((18730 + nodeid))"
             "--net-addr=127.0.0.1:$((19730 + nodeid))"
             "--expected-pow=${expected_pow}"
-            "--closed"
+            "--private-mode"
             "--no-bootstrap-peers"
             "--connections=${expected_connections}"
             "--log-output=${datadir}/node-$nodeid.log"
@@ -451,10 +450,10 @@ rec {
 
         $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
-          $out/bin/tezos-sandbox-client.sh import unencrypted secret key bootstrap\$i "\''${bootstrap_secrets[i]}"
+          $out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i unencrypted:"\''${bootstrap_secrets[i]}"
         done
 
-        $out/bin/tezos-sandbox-client.sh import unencrypted secret key dictator "edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
+        $out/bin/tezos-sandbox-client.sh import secret key dictator "unencrypted:edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
         cp $out/protocol_parameters.json "${datadir}"
       EOF_BOOTSTRAP
 
@@ -469,6 +468,12 @@ rec {
             with fitness ${expected_pow} \
             and key dictator \
             and parameters ${datadir}/protocol_parameters.json
+
+        # TODO: This should not be neccessary; the daemon should be able to bake block 1...
+        FIRST_BAKER="\$($out/bin/tezos-sandbox-client.sh rpc get /chains/main/blocks/head/helpers/baking_rights | jq '.[0].delegate' -r)"
+        sleep $(( 2 * $(jq '.[0]' -r <<< '${time_between_blocks}') ))
+        $out/bin/tezos-sandbox-client.sh -l \
+            bake for "\$FIRST_BAKER"
       EOF_ALPHANET
 
       # create wrapper around client programs, setting arguments for working
@@ -669,7 +674,7 @@ rec {
         datadir = "./bakecentral";
         max_peer_id = "9";
         expected_connections = "3";
-        time_between_blocks = "[5, 5]";
+        time_between_blocks = ''["5"]'';
     };
     bakeCentralSetupScript = pkgs.writeScript "dockersetup.sh" ''
       #!${pkgs.bash}/bin/bash
