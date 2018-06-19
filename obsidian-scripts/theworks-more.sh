@@ -29,7 +29,7 @@ tezos-sandbox-client.sh transfer 50 from "bootstrap0" to "account5"
 for i in $(seq 1 5) ; do
   echo "LAUNCH BAKER: account${i} ON PORT $((9810 + i))"
   tezos-sandbox-client.sh set delegate for "account${i}" to "account${i}"
-  tezos-bake-monitor --port $((9810 + i)) --rpchost 127.0.0.1:$((18731 + i)) --client `which tezos-sandbox-client.sh` --identity "account${i}" &
+  tezos-sandbox-client.sh -A 127.0.0.1 -P $(((i - 1) + 18731)) launch daemon "account${i}" -B -E -D -M --monitor-port $((17730+$i)) &
   sleep 1
 done
 
