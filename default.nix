@@ -471,6 +471,7 @@ rec {
 
         # TODO: This should not be neccessary; the daemon should be able to bake block 1...
         FIRST_BAKER="\$($out/bin/tezos-sandbox-client.sh rpc get /chains/main/blocks/head/helpers/baking_rights | jq '.[0].delegate' -r)"
+        echo "Waiting for first baking opportunity"
         sleep $(( 2 * $(jq '.[0]' -r <<< '${time_between_blocks}') ))
         $out/bin/tezos-sandbox-client.sh -l \
             bake for "\$FIRST_BAKER"
