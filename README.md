@@ -1,9 +1,29 @@
-using docker for bake monitor
------------------------------
+Running the Bake Monitor via Docker
+-----------------------------------
 
-create docker image (with nix)
+1. Build the baker monitor Docker image via `nix`.
 
-    $ docker load -i $(nix-build -A bake-central-docker --no-out-link)
-    $ docker run -p=127.0.0.1:8000:8000 tezos-bake-monitor --pg-connection=<conn string> --route=http://172.0.0.1:8000
+```shell
+docker load -i $(nix-build -A bake-central-docker --no-out-link)
+```
 
+2. Create a Docker network to connect multiple containers.
 
+```shell
+docker network create tezos-baker-network
+```
+
+3. Start a Postgres database instance in the network.
+
+```shell
+docker pull postgres
+docker run --name bake-monitor-db --detach --network tezos-baker-network -e POSTGRES_PASSWORD=secret postgres
+```
+
+4. Start the bake monitor Docker container in the same network and connect it to the appropriate database.
+
+```shell
+docker run --rm -p=8000:8000 --network tezos-baker-network tezos-bake-monitor --pg-connection='host=bake-monitor-db dbname=postgres user=postgres password=secret'
+```
+
+5. Visit the bake monitor at http://localhost:8000.
