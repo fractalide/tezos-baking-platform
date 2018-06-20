@@ -27,10 +27,10 @@ rec {
   ''; # (extremely) fake opam executable that packages can use when requesting certain opam configs that may be blank
 
   onSelection = f: { self, super }:
-    { 
+    {
       selection = super.selection //
         f { self = self.selection; super = super.selection; };
-    }; 
+    };
 
   sourcePackages = [
     {
@@ -634,15 +634,6 @@ rec {
       mkdir -p ${datadir}/bake-monitor/config
       mkdir -p ${datadir}/bake-monitor/exe-config
 
-
-      # TODO: these probably shouldn't be here, make it configurable from UI.
-      if [ ! -f ${datadir}/bake-monitor/config/nodes ] ; then
-        printf '%s' '[]' > ${datadir}/bake-monitor/config/nodes
-      fi
-      if [ ! -f ${datadir}/bake-monitor/config/email ] ; then
-        printf '%s' '["localhost","SMTPProtocol_Plain",2525,"username","passwd"]' > ${datadir}/bake-monitor/config/email
-      fi
-
       # TODO: this more or less does need to be here, but it should really be done by the container setup.
       if [ ! -f ${datadir}/bake-monitor/exe-config/route ] ; then
         cat <<<'["http:","localhost",":8000"]' > ${datadir}/bake-monitor/exe-config/route
@@ -654,7 +645,6 @@ rec {
       EOF_BAKEMONITOR
 
       chmod +x $out/bin/*.sh
-
       '';
   };
 
@@ -668,17 +658,9 @@ rec {
 
   tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central {}).exe;
 
-  bake-central-docker =
-  let
-    mySandbox = sandbox-env {
-        expected_pow = "20";
-        datadir = "./bakecentral";
-        max_peer_id = "9";
-        expected_connections = "3";
-        time_between_blocks = ''["5"]'';
-    };
+  bake-central-docker = let
     bakeCentralSetupScript = pkgs.writeScript "dockersetup.sh" ''
-      #!${pkgs.bash}/bin/bash
+      #!${pkgs.stdenv.shell}
       set -ex
 
       ${pkgs.dockerTools.shadowSetup}
@@ -691,7 +673,7 @@ rec {
       chown 99:99 /var/run/bake-monitor
     '';
     bakeCentralEntrypoint = pkgs.writeScript "entrypoint.sh" ''
-      #!${pkgs.bash}/bin/bash
+      #!${pkgs.stdenv.shell}
       set -ex
 
       mkdir -p  /var/run/bake-monitor
@@ -699,53 +681,29 @@ rec {
       rm /var/run/bake-monitor/config
       mkdir -p /var/run/bake-monitor/config
 
-      # TODO: these probably shouldn't be here, make it configurable from UI.
-      if [ ! -f /var/run/bake-monitor/config/nodes ] ; then
-        printf '%s' '[{"_node_address" : "http://172.17.0.1:18731"}]' > /var/run/bake-monitor/config/nodes
-      fi
-      if [ ! -f /var/run/bake-monitor/config/email ] ; then
-        printf '%s' '["localhost","SMTPProtocol_Plain",2525,"username","passwd"]' > /var/run/bake-monitor/config/email
-      fi
-
-      # TODO: this more or less does need to be here, but it should really be done by the container setup.
-      if [ ! -f /var/run/bake-monitor/config/route ] ; then
-        printf '%s' '["http:","localhost",":8000"]' > /var/run/bake-monitor/config/route
-      fi
-
       cd /var/run/bake-monitor
-      exec ./backend
-      '';
-
+      exec ./backend "$@"
+    '';
   in pkgs.dockerTools.buildImage {
-    name = "tezos";
+    name = "tezos-bake-monitor";
     contents = [
-      # mySandbox
-      # node
-      # client
       pkgs.bash
-      pkgs.postgresql95
+      #pkgs.postgresql95
       tezos-bake-central
-      # tezos-loadtest
-      # pkgs.jq
     ];
     runAsRoot = bakeCentralSetupScript;
     keepContentsDirlinks = true;
     config = {
       Env = [
-        ("PATH=" + builtins.concatStringsSep(":")([
+        ("PATH=" + builtins.concatStringsSep ":" [
           "${pkgs.stdenv.shellPackage}/bin"
           "${pkgs.coreutils}/bin"
-          # "${node}/bin"
-          # "${client}/bin"
-          # "${mySandbox}/bin"
-          # "${pkgs.jq}/bin"
-          ]))
+        ])
       ];
       Expose = 8000;
       Entrypoint = [ bakeCentralEntrypoint ];
       User = "99:99";
     };
   };
-
 }
 
