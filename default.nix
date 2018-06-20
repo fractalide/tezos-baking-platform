@@ -138,14 +138,14 @@ rec {
     {
       name = "tezos-baking-alpha-commands";
       version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_baking;
-      opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha-commands.opam;
+      src = tezos/src/proto_alpha/lib_delegate;
+      opamFile = tezos/src/proto_alpha/lib_delegate/tezos-baking-alpha-commands.opam;
     }
     {
       name = "tezos-baking-alpha";
       version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_baking;
-      opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha.opam;
+      src = tezos/src/proto_alpha/lib_delegate;
+      opamFile = tezos/src/proto_alpha/lib_delegate/tezos-baking-alpha.opam;
     }
     {
       name = "tezos-client-alpha";
@@ -306,12 +306,12 @@ rec {
       src = tezos/src/lib_signer_services;
       opamFile = tezos/src/lib_signer_services/tezos-signer-services.opam;
     }
-    {
-      name = "tezos-client-alpha-services";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_client_services;
-      opamFile = tezos/src/proto_alpha/lib_client_services/tezos-client-alpha-services.opam;
-    }
+#    {
+#      name = "tezos-client-alpha-services";
+#      version = "0.0.0";
+#      src = tezos/src/proto_alpha/lib_client_services;
+#      opamFile = tezos/src/proto_alpha/lib_client_services/tezos-client-alpha-services.opam;
+#    }
   ];
 
   opamSolution = opam2nix.buildOpamPackages sourcePackages {
