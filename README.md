@@ -3,6 +3,8 @@ Running the Bake Monitor via Docker
 
 1) Build the bake monitor Docker image via `nix`.
 
+[You need nix 2. Check with `nix --version`.]
+
 ```shell
 docker load -i $(nix-build -A bake-central-docker --no-out-link)
 ```
