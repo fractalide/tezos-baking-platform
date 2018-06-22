@@ -1,4 +1,4 @@
-{ pkgs ?  import ((import <nixpkgs> {}).fetchFromGitHub {
+{ pkgs ? import ((import <nixpkgs> {}).fetchFromGitHub {
     owner = "NixOS";
     repo = "nixpkgs";
     rev = "8f374ba6312f0204119fe71f321664fd8752a133";
@@ -26,11 +26,10 @@ rec {
     chmod +x "$out/bin/opam"
   ''; # (extremely) fake opam executable that packages can use when requesting certain opam configs that may be blank
 
-  onSelection = f: { self, super }:
-    {
-      selection = super.selection //
-        f { self = self.selection; super = super.selection; };
-    };
+  onSelection = f: { self, super }: {
+    selection = super.selection //
+      f { self = self.selection; super = super.selection; };
+  };
 
   sourcePackages = [
     {
@@ -645,7 +644,7 @@ rec {
       EOF_BAKEMONITOR
 
       chmod +x $out/bin/*.sh
-      '';
+    '';
   };
 
   tezos-bake-monitor = pkgs.callPackage ./tezos-bake-monitor/tezos-bake-monitor {
@@ -659,8 +658,7 @@ rec {
   tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central {}).exe;
 
   bake-central-docker = let
-    bakeCentralSetupScript = pkgs.writeScript "dockersetup.sh" ''
-      #!${pkgs.stdenv.shell}
+    bakeCentralSetupScript = pkgs.dockerTools.shellScript "dockersetup.sh" ''
       set -ex
 
       ${pkgs.dockerTools.shadowSetup}
@@ -672,12 +670,11 @@ rec {
       mkdir -p    /var/run/bake-monitor
       chown 99:99 /var/run/bake-monitor
     '';
-    bakeCentralEntrypoint = pkgs.writeScript "entrypoint.sh" ''
-      #!${pkgs.stdenv.shell}
+    bakeCentralEntrypoint = pkgs.dockerTools.shellScript "entrypoint.sh" ''
       set -ex
 
-      mkdir -p  /var/run/bake-monitor
-      ln -sft /var/run/bake-monitor "${tezos-bake-central}"/*
+      mkdir -p /var/run/bake-monitor
+      ln -sft /var/run/bake-monitor '${tezos-bake-central}'/*
       rm /var/run/bake-monitor/config
       mkdir -p /var/run/bake-monitor/config
 
@@ -686,24 +683,12 @@ rec {
     '';
   in pkgs.dockerTools.buildImage {
     name = "tezos-bake-monitor";
-    contents = [
-      pkgs.bash
-      #pkgs.postgresql95
-      tezos-bake-central
-    ];
     runAsRoot = bakeCentralSetupScript;
     keepContentsDirlinks = true;
     config = {
-      Env = [
-        ("PATH=" + builtins.concatStringsSep ":" [
-          "${pkgs.stdenv.shellPackage}/bin"
-          "${pkgs.coreutils}/bin"
-        ])
-      ];
       Expose = 8000;
-      Entrypoint = [ bakeCentralEntrypoint ];
+      Entrypoint = [bakeCentralEntrypoint];
       User = "99:99";
     };
   };
 }
-
