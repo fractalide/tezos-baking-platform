@@ -295,6 +295,11 @@ rec {
       src = tezos/src/proto_alpha/bin_baker;
     }
     {
+      name = "tezos-endorser-alpha";
+      version = "0.0.0";
+      src = tezos/src/proto_alpha/bin_endorser;
+    }
+    {
       name = "tezos-signer-backends";
       version = "0.0.0";
       src = tezos/src/lib_signer_backends;
@@ -341,6 +346,7 @@ rec {
   node = opamSolution.packages.tezos-node;
   client = opamSolution.packages.tezos-client;
   baker-alpha = opamSolution.packages.tezos-baker-alpha;
+  endorser-alpha = opamSolution.packages.tezos-endorser-alpha;
 
   sandbox =
       { expected_pow ? "20" # Floating point number between 0 and 256 that represents a difficulty, 24 signifies for example that at least 24 leading zeroes are expected in the hash.
