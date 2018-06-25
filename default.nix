@@ -120,6 +120,18 @@ rec {
       src = tezos/src/bin_client;
     }
     {
+      name = "tezos-signer";
+      version = "0.0.0";
+      src = tezos/src/bin_signer;
+      opamFile = tezos/src/bin_signer/tezos-signer.opam;
+    }
+    {
+      name = "tezos-accuser-alpha";
+      version = "0.0.0";
+      src = tezos/src/proto_alpha/bin_accuser;
+      opamFile = tezos/src/proto_alpha/bin_accuser/tezos-accuser-alpha.opam;
+    }
+    {
       name = "tezos-client-base";
       version = "0.0.0";
       src = tezos/src/lib_client_base;
@@ -345,6 +357,8 @@ rec {
   };
   node = opamSolution.packages.tezos-node;
   client = opamSolution.packages.tezos-client;
+  signer = opamSolution.packages.tezos-signer;
+  accuser-alpha = opamSolution.packages.tezos-accuser-alpha;
   baker-alpha = opamSolution.packages.tezos-baker-alpha;
   endorser-alpha = opamSolution.packages.tezos-endorser-alpha;
 
@@ -367,7 +381,10 @@ rec {
       })
       node
       client
+      signer
       baker-alpha
+      accuser-alpha
+      endorser-alpha
       tezos-bake-monitor
       tezos-loadtest
       pkgs.psmisc
