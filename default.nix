@@ -361,7 +361,6 @@ rec {
       node
       client
       baker-alpha
-      tezos-bake-monitor
       tezos-loadtest
       pkgs.psmisc
       pkgs.jq
@@ -383,7 +382,7 @@ rec {
     configurePhase = "true";
     installPhase = "true";
     nativeBuildInputs = [pkgs.psmisc pkgs.jq node client];
-    buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor tezos-loadtest];
+    buildInputs = [pkgs.bash node client baker-alpha tezos-loadtest];
     buildPhase = ''
       mkdir -p $out/bin
       mkdir -p $out/client
@@ -610,7 +609,8 @@ rec {
       set -ex
       $out/bin/tezos-sandbox-bootstrap.sh
 
-      $out/bin/monitored-bakers.sh bootstrap0 bootstrap1 bootstrap2 bootstrap3 bootstrap4
+      # Run 3 of 5 bakers so that sandbox users can start the others manually if needed
+      $out/bin/monitored-bakers.sh bootstrap0 bootstrap1 bootstrap2
 
       # don't start the load test until some progress has been made by the bootstrap bakers.
       while true ; do
@@ -626,22 +626,6 @@ rec {
       # echo "Generating transactions.  (press ^C at any time)"
       ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
-      cat > $out/bin/tezos-sandbox-bake-monitor.sh <<EOF_BAKEMONITOR
-      #!/usr/bin/env bash
-      set -ex
-
-      mkdir -p ${datadir}/bake-monitor/config
-      mkdir -p ${datadir}/bake-monitor/exe-config
-
-      # TODO: this more or less does need to be here, but it should really be done by the container setup.
-      if [ ! -f ${datadir}/bake-monitor/exe-config/route ] ; then
-        cat <<<'["http:","localhost",":8000"]' > ${datadir}/bake-monitor/exe-config/route
-      fi
-
-      cd ${datadir}/bake-monitor
-      ln -sft . "${tezos-bake-central}"/*
-      exec ./backend
-      EOF_BAKEMONITOR
 
       chmod +x $out/bin/*.sh
     '';
