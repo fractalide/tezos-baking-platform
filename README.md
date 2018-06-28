@@ -51,10 +51,10 @@ and then run the script again.
 
 ## Running a node
 
-Enter the sandbox shell:
+Enter the sandbox shell in the `tezos-baking-platform` working copy's root directory:
 
 ```
-$ nix-shell obsidian-scripts/sandbox.nix \
+$ nix-shell -A sandbox \
     --option binary-caches "https://cache.nixos.org/ https://nixcache.reflex-frp.org/" \
     --option binary-cache-public-keys "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI="
 ```
