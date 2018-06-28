@@ -484,9 +484,6 @@ rec {
       #/usr/bin/env bash
         $out/bin/tezos-sandbox-client.sh \
             -block genesis \
-            bootstrapped
-        $out/bin/tezos-sandbox-client.sh \
-            -block genesis \
             activate protocol ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK \
             with fitness ${expected_pow} \
             and key dictator \
@@ -502,11 +499,21 @@ rec {
       # create wrapper around client programs, setting arguments for working
       # within the sandbox.  programs will connect to peer 1 but can be given
       # CLI flags to do otherwise, as the normal client programs already do.
-      cat > $out/bin/tezos-sandbox-client.sh <<EOF_CLIENT
+      set -eux
+      declare -a utilities
+      declare -a nix_paths
+      utilities=(baker-alpha endorser-alpha signer accuser-alpha client)
+      nix_paths=(${baker-alpha} ${endorser-alpha} ${signer} ${accuser-alpha} ${client})
+      for i in "''${!utilities[@]}"; do
+          utility="''${utilities[$i]}"
+          nix_path="''${nix_paths[$i]}"
+          cat > $out/bin/tezos-sandbox-$utility.sh <<EOF_CLIENT
       #!/usr/bin/env bash
       set -ex
-      exec ${client}/bin/tezos-client "--config-file" "$out/client/config" "\$@"
+      exec "$nix_path"/bin/tezos-$utility "--config-file" "$out/client/config" "\$@"
       EOF_CLIENT
+      done
+      set +x
 
       # create a wrapper around tezos-node setting arguments for working within the sandbox
       cat > $out/bin/tezos-sandbox-node.sh <<EOF_NODE
@@ -588,7 +595,9 @@ rec {
       #!/usr/bin/env bash
       set -ex
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
-        $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D -M --monitor-port \$((17730+\$bootstrapid)) >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        $out/bin/tezos-sandbox-baker-alpha.sh run with local node "${datadir}/node-\$bootstrapid" bootstrap\$bootstrapid >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        $out/bin/tezos-sandbox-endorser-alpha.sh run bootstrap\$bootstrapid >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        # We would run an accuser, but we are not economically motivated to.
       done
       EOF_BOOTBAKE
 
@@ -603,15 +612,9 @@ rec {
 
       $out/bin/tezos-sandbox-network.sh
 
-      until $out/bin/tezos-sandbox-client.sh bootstrapped 2>/dev/null ; do
-        echo -n .
-        sleep 1
-      done
-
       $out/bin/bootstrap-env.sh
       $out/bin/bootstrap-alphanet.sh
       EOF_FULLBOOT
-
 
       cat > $out/bin/monitored-bakers.sh << EOF_MONITBAKER
       #!/usr/bin/env bash
