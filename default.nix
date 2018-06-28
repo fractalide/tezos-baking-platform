@@ -1,15 +1,9 @@
-{ pkgs ?  import ((import <nixpkgs> {}).fetchFromGitHub {
-    owner = "NixOS";
-    repo = "nixpkgs";
-    rev = "8f374ba6312f0204119fe71f321664fd8752a133";
-    sha256 = "0qa8k81vlkkad2jd9jw8w50pss1jzw03vj6yz8x856ndiqc7zhg9";
-  }) {}
+{ pkgs ? import ./nixpkgs.nix {}
 }:
-
 rec {
   inherit pkgs;
   inherit (pkgs) lib;
-  opam2nixSrc = builtins.path { path = ./opam2nix; filter = path: type: baseNameOf path != ".git"; };
+  opam2nixSrc = builtins.filterSource (path: type: baseNameOf path != ".git") ./opam2nix;
   opam2nixBin = (pkgs.callPackage "${opam2nixSrc}/nix" { inherit pkgs; }).overrideAttrs (drv: { src = opam2nixSrc; });
   opam2nix = pkgs.callPackage opam2nix-packages/nix { inherit pkgs opam2nixBin ; };
 
@@ -27,10 +21,10 @@ rec {
   ''; # (extremely) fake opam executable that packages can use when requesting certain opam configs that may be blank
 
   onSelection = f: { self, super }:
-    { 
+    {
       selection = super.selection //
         f { self = self.selection; super = super.selection; };
-    }; 
+    };
 
   sourcePackages = [
     {
