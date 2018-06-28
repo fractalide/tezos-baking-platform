@@ -1,8 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
 set -eu
-cd "$(dirname "$0")"
 
-BAKING_APP= ./build.sh
-./install-nix.sh "Tezos Wallet"
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd "$DIR"
+
+BAKING_APP='' ./build.sh
+./install-nix.sh 'Tezos Wallet'
 BAKING_APP=Y ./build.sh
-./install-nix.sh "Tezos Bake"
+./install-nix.sh 'Tezos Bake'
