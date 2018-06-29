@@ -21,7 +21,7 @@ $ git submodule update --recursive --init
 ## Ledger setup
 
 Follow only the *Ledger firmware update* and *udev rules* instructions from the
-[ledger-app-tezos](https://github.com/obsidiansystems/ledger-app-tezos)
+[ledger-app-tezos](https://github.com/obsidiansystems/ledger-app-tezos#instructions-for-nixos)
 instructions.
 
 Make sure your Ledger is plugged in and on the app selection screen. Then run
