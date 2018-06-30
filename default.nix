@@ -480,7 +480,7 @@ rec {
         done
         $out/bin/tezos-sandbox-client.sh \
             -block genesis \
-            activate protocol ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK \
+            activate protocol PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY \
             with fitness ${expected_pow} \
             and key dictator \
             and parameters ${datadir}/protocol_parameters.json
