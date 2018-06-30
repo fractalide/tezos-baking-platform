@@ -10,7 +10,8 @@ with `bootstrap-baking.sh` which is not a script in this directory but a command
 the path by Nix.
 
 `jimmy-works-inner.sh` runs both of those and then runs a series of test commands designed
-to test both the baking app and the wallet app.
+to test both the baking app and the wallet app. You might have to customize this script to have the
+current Ledger path in the import command in this script.
 
 `jimmy-works.sh` does all of this from outside any sandbox: It sets up the Nix sandbox and then
 runs `jimmy-works-inner.sh` inside of it, giving excerpts from its output and logging the full
