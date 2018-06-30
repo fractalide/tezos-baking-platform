@@ -379,7 +379,6 @@ rec {
       baker-alpha
       accuser-alpha
       endorser-alpha
-      tezos-bake-monitor
       tezos-loadtest
       pkgs.psmisc
       pkgs.jq
@@ -401,7 +400,7 @@ rec {
     configurePhase = "true";
     installPhase = "true";
     nativeBuildInputs = [pkgs.psmisc pkgs.jq node client];
-    buildInputs = [pkgs.bash node client baker-alpha tezos-bake-monitor tezos-loadtest];
+    buildInputs = [pkgs.bash node client baker-alpha tezos-loadtest];
     buildPhase = ''
       mkdir -p $out/bin
       mkdir -p $out/client
@@ -465,7 +464,6 @@ rec {
           "edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm"
         )
 
-        $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
           $out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i unencrypted:"\''${bootstrap_secrets[i]}"
         done
@@ -476,6 +474,10 @@ rec {
 
       cat > $out/bin/bootstrap-alphanet.sh <<EOF_ALPHANET
       #/usr/bin/env bash
+        while ! $out/bin/tezos-sandbox-client.sh bootstrapped ; do
+            echo "waiting for network"
+            sleep 1
+        done
         $out/bin/tezos-sandbox-client.sh \
             -block genesis \
             activate protocol ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK \
@@ -484,10 +486,10 @@ rec {
             and parameters ${datadir}/protocol_parameters.json
 
         # TODO: This should not be neccessary; the daemon should be able to bake block 1...
-        FIRST_BAKER="\$($out/bin/tezos-sandbox-client.sh rpc get /chains/main/blocks/head/helpers/baking_rights | jq '.[0].delegate' -r)"
-        sleep $(( 2 * $(jq '.[0]' -r <<< '${time_between_blocks}') ))
-        $out/bin/tezos-sandbox-client.sh -l \
-            bake for "\$FIRST_BAKER"
+        # FIRST_BAKER="\$($out/bin/tezos-sandbox-client.sh rpc get /chains/main/blocks/head/helpers/baking_rights | jq '.[0].delegate' -r)"
+        # sleep $(( 2 * $(jq '.[0]' -r <<< '${time_between_blocks}') ))
+        # $out/bin/tezos-sandbox-client.sh -l \
+        #     bake for "\$FIRST_BAKER"
       EOF_ALPHANET
 
       # create wrapper around client programs, setting arguments for working
@@ -616,10 +618,20 @@ rec {
 
       for i in \$(seq 1 "\$#") ; do
           echo "LAUNCH BAKER:" "\''${!i}"
-          $out/bin/tezos-sandbox-client.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) launch daemon "\''${!i}" -B -E -D -M --monitor-port \$((17730+\$i)) >${datadir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+
+          # TODO ADD THIS BACK WHEN !424 is merged
+          # -M --monitor-port \$((17730+\$i))
+          $out/bin/tezos-sandbox-baker-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run with local node "${datadir}/node-\$i" "\''${!i}" >${datadir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
           sleep 1
           if ! kill -0 \$pid; then
-              echo >&2 "Problem launching tezos-bake-monitor: \$pid"
+              echo >&2 "Problem launching baker: \$pid"
+              false
+          fi
+
+          $out/bin/tezos-sandbox-endorser-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run "\''${!i}" >${datadir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+          sleep 1
+          if ! kill -0 \$pid; then
+              echo >&2 "Problem launching endorser: \$pid"
               false
           fi
       done
@@ -634,11 +646,12 @@ rec {
 
       # don't start the load test until some progress has been made by the bootstrap bakers.
       while true ; do
-        blockhead="\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' 2>/dev/null)"
+        blockhead="\$(tezos-sandbox-client.sh rpc get /chains/main/blocks/head 2>/dev/null)"
         blockhead_ok=\$?
-        if [ \$blockhead_ok -eq 0 -a 3 -le "\$(jq '.level' <<< "\$blockhead")" ] ; then
+        if [ \$blockhead_ok -eq 0 -a 3 -le "\$(jq '.header.level' <<< "\$blockhead")" ] ; then
           break
         else
+          echo "waiting for progress"
           sleep 1
         fi
       done
@@ -646,31 +659,6 @@ rec {
       # echo "Generating transactions.  (press ^C at any time)"
       ${tezos-loadtest}/bin/tezos-loadtest "${datadir}/loadtest-config.json"
       EOF_THEWORKS
-      cat > $out/bin/tezos-sandbox-bake-monitor.sh <<EOF_BAKEMONITOR
-      #!/usr/bin/env bash
-      set -ex
-
-      mkdir -p ${datadir}/bake-monitor/config
-      mkdir -p ${datadir}/bake-monitor/exe-config
-
-
-      # TODO: these probably shouldn't be here, make it configurable from UI.
-      if [ ! -f ${datadir}/bake-monitor/config/nodes ] ; then
-        printf '%s' '[]' > ${datadir}/bake-monitor/config/nodes
-      fi
-      if [ ! -f ${datadir}/bake-monitor/config/email ] ; then
-        printf '%s' '["localhost","SMTPProtocol_Plain",2525,"username","passwd"]' > ${datadir}/bake-monitor/config/email
-      fi
-
-      # TODO: this more or less does need to be here, but it should really be done by the container setup.
-      if [ ! -f ${datadir}/bake-monitor/exe-config/route ] ; then
-        cat <<<'["http:","localhost",":8000"]' > ${datadir}/bake-monitor/exe-config/route
-      fi
-
-      cd ${datadir}/bake-monitor
-      ln -sft . "${tezos-bake-central}"/*
-      exec ./backend
-      EOF_BAKEMONITOR
 
       chmod +x $out/bin/*.sh
 
