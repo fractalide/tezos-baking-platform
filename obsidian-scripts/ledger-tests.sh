@@ -3,7 +3,7 @@ set -eux
 
 echo "Please start out with ledger in baking app"
 if [ "X${1:-}" != "Xexisting" ]; then
-    obsidian-scripts/jimmy-sandbox-setup.sh
+    obsidian-scripts/sandbox-nodes.sh
 fi
 
 bootstrap-baking.sh
