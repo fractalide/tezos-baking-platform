@@ -10,7 +10,10 @@ sleep 15
 bootstrap-env.sh
 bootstrap-alphanet.sh
 
-obsidian-scripts/monitored-bakers.sh bootstrap0 bootstrap1 bootstrap2 bootstrap3 bootstrap4
+tezos-sandbox-client.sh -A 127.0.0.1 -P 18731 launch daemon bootstrap0 -B -E -D &
+tezos-sandbox-client.sh -A 127.0.0.1 -P 18731 launch daemon bootstrap1 -B -E -D &
+tezos-sandbox-client.sh -A 127.0.0.1 -P 18731 launch daemon bootstrap2 -B -E -D &
+tezos-sandbox-client.sh -A 127.0.0.1 -P 18731 launch daemon bootstrap3 -B -E -D &
 
 tezos-sandbox-client.sh gen keys "account1"
 tezos-sandbox-client.sh transfer 1000000 from "bootstrap1" to "account1"

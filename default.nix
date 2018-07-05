@@ -1,15 +1,9 @@
-{ pkgs ? import ((import <nixpkgs> {}).fetchFromGitHub {
-    owner = "NixOS";
-    repo = "nixpkgs";
-    rev = "8f374ba6312f0204119fe71f321664fd8752a133";
-    sha256 = "0qa8k81vlkkad2jd9jw8w50pss1jzw03vj6yz8x856ndiqc7zhg9";
-  }) {}
+{ pkgs ? import ./nixpkgs.nix {}
 }:
-
 rec {
   inherit pkgs;
   inherit (pkgs) lib;
-  opam2nixSrc = builtins.path { path = ./opam2nix; filter = path: type: baseNameOf path != ".git"; };
+  opam2nixSrc = builtins.filterSource (path: type: baseNameOf path != ".git") ./opam2nix;
   opam2nixBin = (pkgs.callPackage "${opam2nixSrc}/nix" { inherit pkgs; }).overrideAttrs (drv: { src = opam2nixSrc; });
   opam2nix = pkgs.callPackage opam2nix-packages/nix { inherit pkgs opam2nixBin ; };
 
@@ -26,10 +20,11 @@ rec {
     chmod +x "$out/bin/opam"
   ''; # (extremely) fake opam executable that packages can use when requesting certain opam configs that may be blank
 
-  onSelection = f: { self, super }: {
-    selection = super.selection //
-      f { self = self.selection; super = super.selection; };
-  };
+  onSelection = f: { self, super }:
+    {
+      selection = super.selection //
+        f { self = self.selection; super = super.selection; };
+    };
 
   sourcePackages = [
     {
@@ -119,6 +114,18 @@ rec {
       src = tezos/src/bin_client;
     }
     {
+      name = "tezos-signer";
+      version = "0.0.0";
+      src = tezos/src/bin_signer;
+      opamFile = tezos/src/bin_signer/tezos-signer.opam;
+    }
+    {
+      name = "tezos-accuser-alpha";
+      version = "0.0.0";
+      src = tezos/src/proto_alpha/bin_accuser;
+      opamFile = tezos/src/proto_alpha/bin_accuser/tezos-accuser-alpha.opam;
+    }
+    {
       name = "tezos-client-base";
       version = "0.0.0";
       src = tezos/src/lib_client_base;
@@ -137,14 +144,14 @@ rec {
     {
       name = "tezos-baking-alpha-commands";
       version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_baking;
-      opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha-commands.opam;
+      src = tezos/src/proto_alpha/lib_delegate;
+      opamFile = tezos/src/proto_alpha/lib_delegate/tezos-baking-alpha-commands.opam;
     }
     {
       name = "tezos-baking-alpha";
       version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_baking;
-      opamFile = tezos/src/proto_alpha/lib_baking/tezos-baking-alpha.opam;
+      src = tezos/src/proto_alpha/lib_delegate;
+      opamFile = tezos/src/proto_alpha/lib_delegate/tezos-baking-alpha.opam;
     }
     {
       name = "tezos-client-alpha";
@@ -294,6 +301,11 @@ rec {
       src = tezos/src/proto_alpha/bin_baker;
     }
     {
+      name = "tezos-endorser-alpha";
+      version = "0.0.0";
+      src = tezos/src/proto_alpha/bin_endorser;
+    }
+    {
       name = "tezos-signer-backends";
       version = "0.0.0";
       src = tezos/src/lib_signer_backends;
@@ -305,12 +317,12 @@ rec {
       src = tezos/src/lib_signer_services;
       opamFile = tezos/src/lib_signer_services/tezos-signer-services.opam;
     }
-    {
-      name = "tezos-client-alpha-services";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_client_services;
-      opamFile = tezos/src/proto_alpha/lib_client_services/tezos-client-alpha-services.opam;
-    }
+#    {
+#      name = "tezos-client-alpha-services";
+#      version = "0.0.0";
+#      src = tezos/src/proto_alpha/lib_client_services;
+#      opamFile = tezos/src/proto_alpha/lib_client_services/tezos-client-alpha-services.opam;
+#    }
   ];
 
   opamSolution = opam2nix.buildOpamPackages sourcePackages {
@@ -339,7 +351,10 @@ rec {
   };
   node = opamSolution.packages.tezos-node;
   client = opamSolution.packages.tezos-client;
+  signer = opamSolution.packages.tezos-signer;
+  accuser-alpha = opamSolution.packages.tezos-accuser-alpha;
   baker-alpha = opamSolution.packages.tezos-baker-alpha;
+  endorser-alpha = opamSolution.packages.tezos-endorser-alpha;
 
   sandbox =
       { expected_pow ? "20" # Floating point number between 0 and 256 that represents a difficulty, 24 signifies for example that at least 24 leading zeroes are expected in the hash.
@@ -360,7 +375,10 @@ rec {
       })
       node
       client
+      signer
       baker-alpha
+      accuser-alpha
+      endorser-alpha
       tezos-loadtest
       pkgs.psmisc
       pkgs.jq
@@ -446,7 +464,6 @@ rec {
           "edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm"
         )
 
-        $out/bin/tezos-sandbox-client.sh bootstrapped
         for i in "\''${!bootstrap_secrets[@]}" ; do
           $out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i unencrypted:"\''${bootstrap_secrets[i]}"
         done
@@ -457,32 +474,42 @@ rec {
 
       cat > $out/bin/bootstrap-alphanet.sh <<EOF_ALPHANET
       #/usr/bin/env bash
+        while ! $out/bin/tezos-sandbox-client.sh bootstrapped ; do
+            echo "waiting for network"
+            sleep 1
+        done
         $out/bin/tezos-sandbox-client.sh \
             -block genesis \
-            bootstrapped
-        $out/bin/tezos-sandbox-client.sh \
-            -block genesis \
-            activate protocol ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK \
+            activate protocol PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY \
             with fitness ${expected_pow} \
             and key dictator \
             and parameters ${datadir}/protocol_parameters.json
 
         # TODO: This should not be neccessary; the daemon should be able to bake block 1...
-        FIRST_BAKER="\$($out/bin/tezos-sandbox-client.sh rpc get /chains/main/blocks/head/helpers/baking_rights | jq '.[0].delegate' -r)"
-        echo "Waiting for first baking opportunity"
-        sleep $(( 2 * $(jq '.[0]' -r <<< '${time_between_blocks}') ))
-        $out/bin/tezos-sandbox-client.sh -l \
-            bake for "\$FIRST_BAKER"
+        # FIRST_BAKER="\$($out/bin/tezos-sandbox-client.sh rpc get /chains/main/blocks/head/helpers/baking_rights | jq '.[0].delegate' -r)"
+        # sleep $(( 2 * $(jq '.[0]' -r <<< '${time_between_blocks}') ))
+        # $out/bin/tezos-sandbox-client.sh -l \
+        #     bake for "\$FIRST_BAKER"
       EOF_ALPHANET
 
       # create wrapper around client programs, setting arguments for working
       # within the sandbox.  programs will connect to peer 1 but can be given
       # CLI flags to do otherwise, as the normal client programs already do.
-      cat > $out/bin/tezos-sandbox-client.sh <<EOF_CLIENT
+      set -eux
+      declare -a utilities
+      declare -a nix_paths
+      utilities=(baker-alpha endorser-alpha signer accuser-alpha client)
+      nix_paths=(${baker-alpha} ${endorser-alpha} ${signer} ${accuser-alpha} ${client})
+      for i in "''${!utilities[@]}"; do
+          utility="''${utilities[$i]}"
+          nix_path="''${nix_paths[$i]}"
+          cat > $out/bin/tezos-sandbox-$utility.sh <<EOF_CLIENT
       #!/usr/bin/env bash
       set -ex
-      exec ${client}/bin/tezos-client "--config-file" "$out/client/config" "\$@"
+      exec "$nix_path"/bin/tezos-$utility "--config-file" "$out/client/config" "\$@"
       EOF_CLIENT
+      done
+      set +x
 
       # create a wrapper around tezos-node setting arguments for working within the sandbox
       cat > $out/bin/tezos-sandbox-node.sh <<EOF_NODE
@@ -564,7 +591,9 @@ rec {
       #!/usr/bin/env bash
       set -ex
       for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
-        $out/bin/tezos-sandbox-client.sh launch daemon bootstrap\$bootstrapid -B -E -D -M --monitor-port \$((17730+\$bootstrapid)) >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        $out/bin/tezos-sandbox-baker-alpha.sh run with local node "${datadir}/node-\$bootstrapid" bootstrap\$bootstrapid >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        $out/bin/tezos-sandbox-endorser-alpha.sh run bootstrap\$bootstrapid >${datadir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+        # We would run an accuser, but we are not economically motivated to.
       done
       EOF_BOOTBAKE
 
@@ -579,15 +608,9 @@ rec {
 
       $out/bin/tezos-sandbox-network.sh
 
-      until $out/bin/tezos-sandbox-client.sh bootstrapped 2>/dev/null ; do
-        echo -n .
-        sleep 1
-      done
-
       $out/bin/bootstrap-env.sh
       $out/bin/bootstrap-alphanet.sh
       EOF_FULLBOOT
-
 
       cat > $out/bin/monitored-bakers.sh << EOF_MONITBAKER
       #!/usr/bin/env bash
@@ -595,10 +618,20 @@ rec {
 
       for i in \$(seq 1 "\$#") ; do
           echo "LAUNCH BAKER:" "\''${!i}"
-          $out/bin/tezos-sandbox-client.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) launch daemon "\''${!i}" -B -E -D -M --monitor-port \$((17730+\$i)) >${datadir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+
+          # TODO ADD THIS BACK WHEN !424 is merged
+          # -M --monitor-port \$((17730+\$i))
+          $out/bin/tezos-sandbox-baker-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run with local node "${datadir}/node-\$i" "\''${!i}" >${datadir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
           sleep 1
           if ! kill -0 \$pid; then
-              echo >&2 "Problem launching tezos-bake-monitor: \$pid"
+              echo >&2 "Problem launching baker: \$pid"
+              false
+          fi
+
+          $out/bin/tezos-sandbox-endorser-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run "\''${!i}" >${datadir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+          sleep 1
+          if ! kill -0 \$pid; then
+              echo >&2 "Problem launching endorser: \$pid"
               false
           fi
       done
@@ -614,11 +647,12 @@ rec {
 
       # don't start the load test until some progress has been made by the bootstrap bakers.
       while true ; do
-        blockhead="\$(tezos-sandbox-client.sh rpc call /blocks/head with '{}' 2>/dev/null)"
+        blockhead="\$(tezos-sandbox-client.sh rpc get /chains/main/blocks/head 2>/dev/null)"
         blockhead_ok=\$?
-        if [ \$blockhead_ok -eq 0 -a 3 -le "\$(jq '.level' <<< "\$blockhead")" ] ; then
+        if [ \$blockhead_ok -eq 0 -a 3 -le "\$(jq '.header.level' <<< "\$blockhead")" ] ; then
           break
         else
+          echo "waiting for progress"
           sleep 1
         fi
       done
