@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -eux
 
+cd "$(dirname "$0")"/..
 echo "Please start out with ledger in baking app"
 if [ "X${1:-}" != "Xexisting" ]; then
-    obsidian-scripts/sandbox-nodes.sh
+    scripts/sandbox-nodes.sh
 fi
 
 bootstrap-baking.sh
 
-tezos-sandbox-client.sh import secret key my-ledger "ledger://tz3druEQeUqdDKwyMvXHUKirBj6XMTbeivQZ/0'/0'"
+tezos-sandbox-client.sh import secret key my-ledger "ledger://tz1VasatP7zmHDxPeBn97YoSFowXLdsBAdW9/0'/0'"
 attempt() {
     while ! "$@"; do
         echo 'Failed'

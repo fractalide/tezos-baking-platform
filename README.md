@@ -62,7 +62,7 @@ $ nix-shell -A sandbox \
 And this script will run a node on zeronet:
 
 ```
-$ obsidian-scripts/zeronet-node.sh
+$ scripts/zeronet-node.sh
 ```
 
 The node needs to remain running while you run all of the `tezos-client`
