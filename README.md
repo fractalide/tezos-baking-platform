@@ -7,13 +7,13 @@ manager which you can install on any Linux distribution.
 
 Please clone the
 [Tezos Baking Platform](https://gitlab.com/obsidian.systems/tezos-baking-platform) and
-check out the `zeronet-new` branch, updating submodules. These are the commands to run
+check out the `develop` branch, updating submodules. These are the commands to run
 in the freshly-cloned repo:
 
 ```
 $ git clone https://gitlab.com/obsidian.systems/tezos-baking-platform.git
 $ cd tezos-baking-platform
-$ git checkout zeronet-new
+$ git checkout develop
 $ git submodule sync
 $ git submodule update --recursive --init
 ```
