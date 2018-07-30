@@ -27,9 +27,15 @@ attempt tezos-sandbox-client.sh transfer 2000001 from bootstrap1 to my-ledger
 attempt tezos-sandbox-client.sh set delegate for my-ledger to my-ledger
 
 echo "Switch to transaction app"
-attempt tezos-sandbox-client.sh transfer 1 from my-ledger to bootstrap1
+sleep 5
+attempt tezos-sandbox-client.sh transfer 12 from my-ledger to bootstrap1
+attempt tezos-sandbox-client.sh originate account original for my-ledger transferring 40 from my-ledger --delegatable
+attempt tezos-sandbox-client.sh transfer 15 from original to bootstrap1
+attempt tezos-sandbox-client.sh transfer 13 from my-ledger to original
+attempt tezos-sandbox-client.sh set delegate for original to my-ledger
 
 echo "Switch back to baking app"
+sleep 5
 attempt ledger/reset.sh 00000000 # Reset high water mark
 
 exec tezos-sandbox-baker-alpha.sh run with local node sandbox/node-1 my-ledger
