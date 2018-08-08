@@ -6,9 +6,9 @@ cd "$DIR"
 
 if ! [ "${1:-X}" = wallet ]; then
     BAKING_APP=Y ./build.sh
-    ./install-nix.sh 'Tezos Bake'
+    ./install-nix.sh 'Tezos Bake'${2:-}
 fi
 if ! [ "${1:-X}" = bake ]; then
     BAKING_APP='' ./build.sh
-    ./install-nix.sh 'Tezos Wallet'
+    ./install-nix.sh 'Tezos Wallet'${2:-}
 fi
