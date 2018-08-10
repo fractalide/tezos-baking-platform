@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-set -eux
+set -eu
 
 cd "$(dirname "$0")"/..
-if [ "X${1:-}" != "Xexisting" ]; then
-    scripts/sandbox-nodes.sh
-fi
 
-bootstrap-baking.sh
+export TEZOS_CLIENT_UNSAFE_DISABLE_DISCLAIMER=Y
+scripts/ledger-start.sh
 
-tezos-sandbox-client.sh import secret key my-ledger "ledger://tz1VasatP7zmHDxPeBn97YoSFowXLdsBAdW9/0'/0'"
 attempt() {
+    echo "$@"
     while ! "$@"; do
         echo 'Failed'
         sleep 3
