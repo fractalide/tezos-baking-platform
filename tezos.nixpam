@@ -1,0 +1,19 @@
+opam-version: "2.0"
+world-path: "nix/tezos/world/default.nix"
+include: ["c*"]
+inherit: [
+  "pkgs.ocaml-ng.ocamlPackages_4_06" { name = "ocaml" | name = "ocamlfind" }
+]
+attribute-name: [
+  "findlib" { name = "ocamlfind" }
+  "ocaml-hidapi" { name = "ocaml" }
+]
+expression-path: [
+  "nix/tezos/world/%{attribute}%/default.nix"
+]
+depexts: [
+  ["ncurses"] { name = "lwt" }
+]
+patches: [
+  "patches/pkg-config.patch" { name = "ocb-stubblr" }
+]
