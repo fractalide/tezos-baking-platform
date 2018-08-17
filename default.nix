@@ -1,4 +1,4 @@
-{ pkgs ? import ./nixpkgs.nix {}
+{ pkgs ? import nix/nixpkgs.nix {}
 }:
 rec {
   inherit pkgs;
@@ -20,341 +20,34 @@ rec {
     chmod +x "$out/bin/opam"
   ''; # (extremely) fake opam executable that packages can use when requesting certain opam configs that may be blank
 
-  onSelection = f: { self, super }:
-    {
-      selection = super.selection //
-        f { self = self.selection; super = super.selection; };
-    };
+  tezosWorld = pkgs.callPackage nix/tezos/world {};
 
-  sourcePackages = [
-    {
-      name = "bip39";
-      version = "dev";
-      src = tezos/vendors/ocaml-bip39;
-    }
-    {
-      name = "irmin-lmdb";
-      version = "dev";
-      src = tezos/vendors/irmin-lmdb;
-      opamFile = tezos/vendors/irmin-lmdb/irmin-lmdb.opam;
-    }
-    {
-      name = "lmdb";
-      version = "dev";
-      src = tezos/vendors/ocaml-lmdb;
-      opamFile = tezos/vendors/ocaml-lmdb/lmdb.opam;
-    }
-    {
-      name = "uecc";
-      version = "dev";
-      src = tezos/vendors/ocaml-uecc;
-      opamFile = tezos/vendors/ocaml-uecc/uecc.opam;
-    }
-    {
-      name = "hacl";
-      version = "dev";
-      src = tezos/vendors/ocaml-hacl;
-      opamFile = tezos/vendors/ocaml-hacl/hacl.opam;
-    }
-    {
-      name = "ocplib-json-typed";
-      version = "dev";
-      src = tezos/vendors/ocplib-json-typed/lib_json_typed;
-    }
-    {
-      name = "ocplib-json-typed-bson";
-      version = "dev";
-      src = tezos/vendors/ocplib-json-typed/lib_json_typed_bson;
-    }
-    {
-      name = "ocplib-resto";
-      version = "dev";
-      src = tezos/vendors/ocplib-resto/lib_resto;
-    }
-    {
-      name = "ocplib-resto-cohttp";
-      version = "0.0.0";
-      src = tezos/vendors/ocplib-resto/lib_resto-cohttp;
-    }
-    {
-      name = "ocplib-resto-directory";
-      version = "dev";
-      src = tezos/vendors/ocplib-resto/lib_resto-directory;
-    }
-    {
-      name = "blake2";
-      version = "dev";
-      src = tezos/vendors/ocaml-blake2;
-    }
-    {
-      name = "secp256k1";
-      version = "0.1";
-      src = tezos/vendors/ocaml-secp256k1;
-    }
-    {
-      name = "ledgerwallet-tezos";
-      version = "0.1";
-      src = tezos/vendors/ocaml-ledger-wallet;
-      opamFile = "ledgerwallet-tezos.opam";
-    }
-    {
-      name = "ledgerwallet";
-      version = "dev";
-      src = tezos/vendors/ocaml-ledger-wallet;
-      opamFile = "ledgerwallet.opam";
-    }
-    {
-      name = "tezos-clic";
-      version = "0.0.0";
-      src = tezos/src/lib_clic;
-    }
-    {
-      name = "tezos-client";
-      version = "0.0.0";
-      src = tezos/src/bin_client;
-    }
-    {
-      name = "tezos-signer";
-      version = "0.0.0";
-      src = tezos/src/bin_signer;
-      opamFile = tezos/src/bin_signer/tezos-signer.opam;
-    }
-    {
-      name = "tezos-accuser-alpha";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/bin_accuser;
-      opamFile = tezos/src/proto_alpha/bin_accuser/tezos-accuser-alpha.opam;
-    }
-    {
-      name = "tezos-client-base";
-      version = "0.0.0";
-      src = tezos/src/lib_client_base;
-    }
-    {
-      name = "tezos-client-base-unix";
-      version = "0.0.0";
-      src = tezos/src/lib_client_base_unix;
-    }
-    {
-      name = "tezos-protocol-alpha";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_protocol;
-      opamFile = tezos/src/proto_alpha/lib_protocol/tezos-protocol-alpha.opam;
-    }
-    {
-      name = "tezos-baking-alpha-commands";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_delegate;
-      opamFile = tezos/src/proto_alpha/lib_delegate/tezos-baking-alpha-commands.opam;
-    }
-    {
-      name = "tezos-baking-alpha";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_delegate;
-      opamFile = tezos/src/proto_alpha/lib_delegate/tezos-baking-alpha.opam;
-    }
-    {
-      name = "tezos-client-alpha";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_client;
-    }
-    {
-      name = "tezos-client-alpha-commands";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_client_commands;
-    }
-    {
-      name = "tezos-client-commands";
-      version = "0.0.0";
-      src = tezos/src/lib_client_commands;
-    }
-    {
-      name = "tezos-client-genesis";
-      version = "0.0.0";
-      src = tezos/src/proto_genesis/lib_client;
-    }
-    {
-      name = "tezos-node";
-      version = "0.0.0";
-      src = tezos/src/bin_node;
-    }
-    {
-      name = "tezos-embedded-protocol-alpha";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/lib_protocol;
-      opamFile = tezos/src/proto_alpha/lib_protocol/tezos-embedded-protocol-alpha.opam;
-    }
-    {
-      name = "tezos-protocol-compiler";
-      version = "0.0.0";
-      src = tezos/src/lib_protocol_compiler;
-    }
-    {
-      name = "tezos-protocol-updater";
-      version = "0.0.0";
-      src = tezos/src/lib_protocol_updater;
-    }
-    {
-      name = "tezos-storage";
-      version = "0.0.0";
-      src = tezos/src/lib_storage;
-    }
-    {
-      name = "tezos-stdlib-unix";
-      version = "0.0.0";
-      src = tezos/src/lib_stdlib_unix;
-    }
-    {
-      name = "tezos-embedded-protocol-demo";
-      version = "0.0.0";
-      src = tezos/src/proto_demo/lib_protocol;
-      opamFile = tezos/src/proto_demo/lib_protocol/tezos-embedded-protocol-demo.opam;
-    }
-    {
-      name = "tezos-base";
-      version = "0.0.0";
-      src = tezos/src/lib_base;
-    }
-    {
-      name = "tezos-crypto";
-      version = "0.0.0";
-      src = tezos/src/lib_crypto;
-    }
-    {
-      name = "tezos-stdlib";
-      version = "0.0.0";
-      src = tezos/src/lib_stdlib;
-    }
-    {
-      name = "tezos-shell";
-      version = "0.0.0";
-      src = tezos/src/lib_shell;
-    }
-    {
-      name = "tezos-shell-services";
-      version = "0.0.0";
-      src = tezos/src/lib_shell_services;
-    }
-    {
-      name = "tezos-micheline";
-      version = "0.0.0";
-      src = tezos/src/lib_micheline;
-    }
-    {
-      name = "tezos-error-monad";
-      version = "0.0.0";
-      src = tezos/src/lib_error_monad;
-    }
-    {
-      name = "tezos-data-encoding";
-      version = "0.0.0";
-      src = tezos/src/lib_data_encoding;
-    }
-    {
-      name = "tezos-rpc";
-      version = "0.0.0";
-      src = tezos/src/lib_rpc;
-    }
-    {
-      name = "tezos-rpc-http";
-      version = "0.0.0";
-      src = tezos/src/lib_rpc_http;
-    }
-    {
-      name = "tezos-p2p";
-      version = "0.0.0";
-      src = tezos/src/lib_p2p;
-    }
-    {
-      name = "tezos-protocol-environment";
-      version = "0.0.0";
-      src = tezos/src/lib_protocol_environment;
-      opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment.opam;
-    }
-    {
-      name = "tezos-protocol-environment-shell";
-      version = "0.0.0";
-      src = tezos/src/lib_protocol_environment;
-      opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment-shell.opam;
-    }
-    {
-      name = "tezos-protocol-genesis";
-      version = "0.0.0";
-      src = tezos/src/proto_genesis/lib_protocol;
-      opamFile = tezos/src/proto_genesis/lib_protocol/tezos-protocol-genesis.opam;
-    }
-    {
-      name = "tezos-embedded-protocol-genesis";
-      version = "0.0.0";
-      src = tezos/src/proto_genesis/lib_protocol;
-      opamFile = tezos/src/proto_genesis/lib_protocol/tezos-embedded-protocol-genesis.opam;
-    }
-    {
-      name = "tezos-protocol-environment-sigs";
-      version = "0.0.0";
-      src = tezos/src/lib_protocol_environment;
-      opamFile = tezos/src/lib_protocol_environment/tezos-protocol-environment-sigs.opam;
-    }
-    {
-      name = "tezos-baker-alpha";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/bin_baker;
-    }
-    {
-      name = "tezos-endorser-alpha";
-      version = "0.0.0";
-      src = tezos/src/proto_alpha/bin_endorser;
-    }
-    {
-      name = "tezos-signer-backends";
-      version = "0.0.0";
-      src = tezos/src/lib_signer_backends;
-      opamFile = tezos/src/lib_signer_backends/tezos-signer-backends.opam;
-    }
-    {
-      name = "tezos-signer-services";
-      version = "0.0.0";
-      src = tezos/src/lib_signer_services;
-      opamFile = tezos/src/lib_signer_services/tezos-signer-services.opam;
-    }
-#    {
-#      name = "tezos-client-alpha-services";
-#      version = "0.0.0";
-#      src = tezos/src/proto_alpha/lib_client_services;
-#      opamFile = tezos/src/proto_alpha/lib_client_services/tezos-client-alpha-services.opam;
-#    }
-  ];
+  tezos = tezosWorld.callPackage nix/tezos.nix {};
 
-  opamSolution = opam2nix.buildOpamPackages sourcePackages {
-    ocamlAttr = "ocamlPackages_latest.ocaml";
-    specs = [
-      { name = "jbuilder"; constraint = "=1.0+beta20"; }
-      { name = "ocb-stubblr"; }
-      { name = "cpuid"; }
+  tezos-opam-sandbox = pkgs.stdenv.mkDerivation {
+    name = "tezos-opam-sandbox";
+    src = null;
+    doUnpack = false;
+    phases = [ "buildPhase" ];
+    buildPhase = "mkdir -p $out";
+    nativeBuildInputs = [
+      (pkgs.ocaml-ng.ocamlPackages_4_06.callPackage nix/opam2.nix {})
+      pkgs.ocaml-ng.ocamlPackages_4_06.ocaml
+      pkgs.bubblewrap
+      pkgs.curl
+      pkgs.git
+      pkgs.gmp
+      pkgs.hidapi
+      pkgs.libev
+      pkgs.m4
+      pkgs.rsync
+      pkgs.perl
+      pkgs.pkgconfig
+      pkgs.unzip
+      pkgs.which
     ];
-    select = (onSelection ({ self, super }: {
-      leveldb = addBuildInputs super.leveldb [ pkgs.snappy ];
-      ocplib-resto-cohttp = addBuildInputs super.ocplib-resto-cohttp [self.jbuilder self.lwt self.ocplib-resto self.ocplib-resto-directory];
-      ocplib-resto-directory = addBuildInputs super.ocplib-resto-directory [self.jbuilder self.lwt self.ocplib-resto];
-      tezos-rpc-http = addBuildInputs super.tezos-rpc-http [self.ocplib-resto-cohttp];
-      cpuid = addBuildInputs super.cpuid [ fauxpam ];
-      nocrypto = addBuildInputs super.nocrypto [ fauxpam ];
-      tezos-node = addBuildInputs super.tezos-node [ pkgs.snappy ];
-      hidapi = addBuildInputs super.hidapi [ pkgs.pkgconfig pkgs.hidapi ];
-      num = super.num.overrideAttrs (drv: { buildPhase = ''
-        ${drv.buildPhase}
-        set -x
-        sed -Ei 's#^install:#insplode:#' src/Makefile
-        sed -Ei 's#^findlib-install:#install:#' src/Makefile
-      ''; });
-    }));
   };
-  node = opamSolution.packages.tezos-node;
-  client = opamSolution.packages.tezos-client;
-  signer = opamSolution.packages.tezos-signer;
-  accuser-alpha = opamSolution.packages.tezos-accuser-alpha;
-  baker-alpha = opamSolution.packages.tezos-baker-alpha;
-  endorser-alpha = opamSolution.packages.tezos-endorser-alpha;
+
 
   sandbox =
       { expected_pow ? "20" # Floating point number between 0 and 256 that represents a difficulty, 24 signifies for example that at least 24 leading zeroes are expected in the hash.
@@ -373,12 +66,7 @@ rec {
       (sandbox-env {
         inherit expected_pow datadir max_peer_id expected_connections time_between_blocks;
       })
-      node
-      client
-      signer
-      baker-alpha
-      accuser-alpha
-      endorser-alpha
+      tezos
       tezos-loadtest
       pkgs.psmisc
       pkgs.jq
@@ -399,8 +87,8 @@ rec {
 
     configurePhase = "true";
     installPhase = "true";
-    nativeBuildInputs = [pkgs.psmisc pkgs.jq node client];
-    buildInputs = [pkgs.bash node client baker-alpha tezos-loadtest];
+    nativeBuildInputs = [pkgs.psmisc pkgs.jq tezos];
+    buildInputs = [pkgs.bash tezos-loadtest];
     buildPhase = ''
       mkdir -p $out/bin
       mkdir -p $out/client
@@ -433,7 +121,7 @@ rec {
         for peerid in $(seq 1 ${max_peer_id}) ; do
           node_args=("''${node_args[@]}" "--peer=127.0.0.1:$((19730 + peerid))")
         done
-        ${node}/bin/tezos-node config init "''${node_args[@]}"
+        ${tezos}/bin/tezos-node config init "''${node_args[@]}"
       done
 
       cat > $out/bin/sandbox-env.inc.sh << EOF_ENVIRON
@@ -499,7 +187,7 @@ rec {
       declare -a utilities
       declare -a nix_paths
       utilities=(baker-alpha endorser-alpha signer accuser-alpha client)
-      nix_paths=(${baker-alpha} ${endorser-alpha} ${signer} ${accuser-alpha} ${client})
+      nix_paths=(${tezos})
       for i in "''${!utilities[@]}"; do
           utility="''${utilities[$i]}"
           nix_path="''${nix_paths[$i]}"
@@ -520,7 +208,7 @@ rec {
 
       mkdir -p "${datadir}/node-\$nodeid"
       if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
-        ${node}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+        ${tezos}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
       fi
 
       # logfile is already redirected by config
@@ -531,7 +219,7 @@ rec {
         done
       fi;
 
-      exec ${node}/bin/tezos-node "\$@" "\''${node_args[@]}"
+      exec ${tezos}/bin/tezos-node "\$@" "\''${node_args[@]}"
       EOF_NODE
 
       # as above, but creates a fragile network where the loss of peer 1 causes a split-brain situation.
@@ -552,7 +240,7 @@ rec {
 
       mkdir -p "$out/node-$nodeid"
       if [ ! -f "${datadir}/node-\$nodeid/identity.json" ] ; then
-        ${node}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+        ${tezos}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
       fi
 
       left_hemisphere=($(seq 2 2 ${max_peer_id}) )
@@ -573,7 +261,7 @@ rec {
         fi
       fi
 
-      exec ${node}/bin/tezos-node "\$@" "\''${node_args[@]}"
+      exec ${tezos}/bin/tezos-node "\$@" "\''${node_args[@]}"
       EOF_FRAGILENODE
 
 

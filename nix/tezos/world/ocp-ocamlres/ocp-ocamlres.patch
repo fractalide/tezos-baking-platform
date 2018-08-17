@@ -1,0 +1,12 @@
+diff --git a/Makefile b/Makefile
+index 8523322..b918e95 100644
+--- a/Makefile
++++ b/Makefile
+@@ -113,6 +113,7 @@ install: all
+           src/*ocplib-ocamlres-runtime.* \
+ 	  $(RUNLIB_CMI) $(RUNLIB_CMTI) $(RUNLIB_CMT) $(RUNLIB_MLI) $(RUNLIB_ML) \
+ 	  $(LIB_CMI) $(LIB_CMTI) $(LIB_CMT) $(LIB_MLI) $(LIB_ML)
++	install -d $(BINDIR)
+ 	install ocp-ocamlres.asm $(BINDIR)/ocp-ocamlres
+ 	install ocp-ocamlres.byte $(BINDIR)/ocp-ocamlres.byte
+ 

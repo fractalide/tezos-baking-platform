@@ -1,0 +1,30 @@
+diff --git a/opam b/opam
+index 4a875fb..d1acc2d 100644
+--- a/opam
++++ b/opam
+@@ -9,11 +9,11 @@ doc: "https://whitequark.github.io/ppx_deriving"
+ bug-reports: "https://github.com/whitequark/ppx_deriving/issues"
+ dev-repo: "https://github.com/whitequark/ppx_deriving.git"
+ tags: [ "syntax" ]
+-substs: [ "pkg/META" ]
+ build: [
++  ["sh" "pkg/subst.sh" "%{version}%"]
+   # If there is no native dynlink, we can't use native builds
+-  "ocaml" "pkg/build.ml" "native=%{ocaml-native-dynlink}%"
+-                         "native-dynlink=%{ocaml-native-dynlink}%"
++  ["ocaml" "pkg/build.ml" "native=%{ocaml-native-dynlink}%"
++                         "native-dynlink=%{ocaml-native-dynlink}%"]
+ ]
+ build-test: [
+   "ocamlbuild" "-classic-display" "-use-ocamlfind" "src_test/test_ppx_deriving.byte" "--"
+diff --git a/pkg/subst.sh b/pkg/subst.sh
+new file mode 100644
+index 0000000..5dc902c
+--- /dev/null
++++ b/pkg/subst.sh
+@@ -0,0 +1,5 @@
++#!/bin/sh
++
++sed "s/%{version}%/$1/g" pkg/META.in > pkg/META
++
++

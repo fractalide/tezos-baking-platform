@@ -1,10 +1,17 @@
-{ pkgs ? import ../nixpkgs.nix {} }:
+{ pkgs ? import ../nix/nixpkgs.nix {} }:
 let
-  clang = pkgs.requireFile {
+  requireCurl = { url, sha256 }: pkgs.lib.overrideDerivation
+    (pkgs.requireFile { inherit url sha256; })
+    (attrs: {
+       builder = pkgs.writeScript "get-the-thing" ''
+         ${pkgs.curl}/bin/curl --url '${url}' -o $out
+       '';
+     });
+  clang = requireCurl {
     url = http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.10.tar.xz;
     sha256 = "0j0kc73xvm2dl84f7gd2kh6a8nxlr7alk91846m0im77mvm631rv";
   };
-  gcc = pkgs.requireFile {
+  gcc = requireCurl {
     url = https://launchpadlibrarian.net/251687888/gcc-arm-none-eabi-5_3-2016q1-20160330-linux.tar.bz2;
     sha256 = "08x2sv2mhx3l3adw8kgcvmrs10qav99al410wpl18w19yfq50y11";
   };

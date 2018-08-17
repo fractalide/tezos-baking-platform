@@ -1,19 +1,32 @@
 opam-version: "2.0"
 world-path: "nix/tezos/world/default.nix"
-include: ["c*"]
+include: ["*"]
+skip: ["ocaml-base-compiler"]
+custom: [
+  "nix/opam2.nix" { name = "opam" }
+  "nix/conf-libev" { name = "conf-libev" }
+  "nix/nocrypto" { name = "nocrypto" }
+]
 inherit: [
   "pkgs.ocaml-ng.ocamlPackages_4_06" { name = "ocaml" | name = "ocamlfind" }
 ]
 attribute-name: [
   "findlib" { name = "ocamlfind" }
-  "ocaml-hidapi" { name = "ocaml" }
+  "ocaml-hidapi" { name = "hidapi" }
 ]
 expression-path: [
   "nix/tezos/world/%{attribute}%/default.nix"
 ]
 depexts: [
   ["ncurses"] { name = "lwt" }
+  ["gmp"] { name = "conf-gmp" }
+  ["libev"] { name = "conf-libev" }
+  ["pkgconfig"] { name = "conf-pkg-config" }
+  ["pkgconfig"] { name = "hidapi" }
+  ["hidapi"] { name = "conf-hidapi" }
 ]
 patches: [
   "patches/pkg-config.patch" { name = "ocb-stubblr" }
+  "patches/ocp-ocamlres.patch" { name = "ocp-ocamlres" }
+  "patches/ppx_deriving.patch" { name = "ppx_deriving" }
 ]
