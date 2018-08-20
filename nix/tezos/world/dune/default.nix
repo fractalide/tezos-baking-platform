@@ -32,7 +32,7 @@
     "jbuilder" {!= "transition"}
   ]
   build: [
-    ["ocaml" "configure.ml" "--libdir" lib]
+    ["ocaml" "configure.ml"]
     ["ocaml" "bootstrap.ml"]
     ["./boot.exe" "--release" "--subst"] {pinned}
     ["./boot.exe" "--release" "-j" jobs]
@@ -49,7 +49,7 @@
   "sha512=f06c903a5607b4d5cce2e70d51d2e393ce91aa9d5880f677781e287d67ca43fef3acfbfc8b76b14969f9e0e2f38fa40f26507eb99357831828d0aeb49b12499f"
     ]
   }*/
-{ doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib }:
+{ doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, fauxpam }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.02.3") >= 0;
 
@@ -64,13 +64,13 @@ stdenv.mkDerivation rec {
     sha256 = "0ndfhvr13fmf7azw9kx0z3kg3ckv7sg0iav1qpmrgbd4v73hhkss";
   };
   buildInputs = [
-    ocaml findlib ];
+    ocaml findlib fauxpam ];
   propagatedBuildInputs = [
-    ocaml ];
+    ocaml fauxpam ];
   configurePhase = "true";
   buildPhase = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")
   [
-    [ "'ocaml'" "'configure.ml'" "'--libdir'" "$OCAMLFIND_DESTDIR" ] [
+    [ "'ocaml'" "'configure.ml'" ] [
       "'ocaml'" "'bootstrap.ml'" ]
     [ "'./boot.exe'" "'--release'" "'-j'" "1" ] ];
   preInstall = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")

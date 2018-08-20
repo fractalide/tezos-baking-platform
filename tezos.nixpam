@@ -13,6 +13,7 @@ inherit: [
 attribute-name: [
   "findlib" { name = "ocamlfind" }
   "ocaml-hidapi" { name = "hidapi" }
+  "ocaml-result" { name = "result" }
 ]
 expression-path: [
   "nix/tezos/world/%{attribute}%/default.nix"
@@ -24,6 +25,7 @@ depexts: [
   ["pkgconfig"] { name = "conf-pkg-config" }
   ["pkgconfig"] { name = "hidapi" }
   ["hidapi"] { name = "conf-hidapi" }
+  ["fauxpam"] { name = "dune" }
 ]
 patches: [
   "patches/pkg-config.patch" { name = "ocb-stubblr" }

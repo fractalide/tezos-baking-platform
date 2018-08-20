@@ -6,13 +6,18 @@ use Getopt::Std;
 
 our $opt_v;
 our $opt_p;
-getopts "v:p:";
+our $opt_r;
+our $opt_t;
+getopts "v:p:t:r:";
 
 my $OPAM_RELEASE = $opt_v // "2.0.0";
-my $OPAM_RELEASE_SHA256 = `nix-prefetch-url https://github.com/ocaml/opam/archive/$OPAM_RELEASE.zip`;
+my $OPAM_TAG = $opt_t // $OPAM_RELEASE;
+my $OPAM_GITHUB_REPO = $opt_r // "ocaml/opam";
+my $OPAM_RELEASE_URL = "https://github.com/$OPAM_GITHUB_REPO/archive/$OPAM_TAG.zip";
+my $OPAM_RELEASE_SHA256 = `nix-prefetch-url \Q$OPAM_RELEASE_URL\E`;
 chomp $OPAM_RELEASE_SHA256;
 
-my $OPAM_BASE_URL = "https://raw.githubusercontent.com/ocaml/opam/$OPAM_RELEASE";
+my $OPAM_BASE_URL = "https://raw.githubusercontent.com/$OPAM_GITHUB_REPO/$OPAM_TAG";
 my $OPAM_OPAM = `curl -L --url \Q$OPAM_BASE_URL\E/opam-devel.opam`;
 my($OCAML_MIN_VERSION) = $OPAM_OPAM =~ /^available: ocaml-version >= "(.*)"$/m
   or die "could not parse ocaml version bound\n";
@@ -53,7 +58,7 @@ EOF
 
 print <<"EOF";
     opam = fetchurl {
-      url = "https://github.com/ocaml/opam/archive/$OPAM_RELEASE.zip";
+      url = "$OPAM_RELEASE_URL";
       sha256 = "$OPAM_RELEASE_SHA256";
     };
   };

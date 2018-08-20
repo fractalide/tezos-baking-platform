@@ -11,16 +11,12 @@ rec {
     buildInputs = (attrs.buildInputs or []) ++ buildInputs;
   });
 
-  fauxpam = pkgs.runCommand "fauxpam" {} ''
-    mkdir -p "$out/bin"
-    cat >"$out/bin/opam" <<'EOF'
-    #!/bin/sh
-    echo "$@"
-    EOF
-    chmod +x "$out/bin/opam"
-  ''; # (extremely) fake opam executable that packages can use when requesting certain opam configs that may be blank
+  withFauxpam = lib.makeScope pkgs.newScope (self: pkgs // {
+    pkgs = self;
+    fauxpam = pkgs.callPackage nix/fauxpam.nix {};
+  });
 
-  tezosWorld = pkgs.callPackage nix/tezos/world {};
+  tezosWorld = withFauxpam.callPackage nix/tezos/world {};
 
   tezos = tezosWorld.callPackage nix/tezos.nix {};
 
