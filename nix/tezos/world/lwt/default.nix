@@ -70,8 +70,9 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, cppo, jbuilder, findlib,
-  ocaml-migrate-parsetree, ppx_tools_versioned, result, base-threads ? null,
-  base-unix ? null, camlp4 ? null, conf-libev ? null, ncurses }:
+  ocaml-migrate-parsetree, ppx_tools_versioned, ocaml-result,
+  base-threads ? null, base-unix ? null, camlp4 ? null, conf-libev ? null,
+  ncurses }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.02.0") >= 0;
 assert (vcompare cppo "1.1.0") >= 0;
@@ -91,7 +92,7 @@ stdenv.mkDerivation rec {
   };
   buildInputs = [
     ocaml cppo jbuilder findlib ocaml-migrate-parsetree ppx_tools_versioned
-    result ]
+    ocaml-result ]
   ++
   stdenv.lib.optional
   (base-threads
@@ -121,7 +122,7 @@ stdenv.mkDerivation rec {
     ncurses ];
   propagatedBuildInputs = [
     ocaml cppo jbuilder findlib ocaml-migrate-parsetree ppx_tools_versioned
-    result ]
+    ocaml-result ]
   ++
   stdenv.lib.optional
   (base-threads

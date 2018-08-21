@@ -31,4 +31,5 @@ patches: [
   "patches/pkg-config.patch" { name = "ocb-stubblr" }
   "patches/ocp-ocamlres.patch" { name = "ocp-ocamlres" }
   "patches/ppx_deriving.patch" { name = "ppx_deriving" }
+  "patches/dune-libdir.patch" { name = "dune" }
 ]

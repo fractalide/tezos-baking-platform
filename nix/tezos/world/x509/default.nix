@@ -66,8 +66,8 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, ocamlbuild,
-  ppx_sexp_conv, topkg, result, cstruct, sexplib, asn1-combinators, ptime,
-  nocrypto, astring, ounit ? null, cstruct-unix ? null }:
+  ppx_sexp_conv, topkg, ocaml-result, cstruct, sexplib, asn1-combinators,
+  ptime, nocrypto, astring, ounit ? null, cstruct-unix ? null }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.02.2") >= 0;
 assert (vcompare ppx_sexp_conv "v0.11.0") < 0;
@@ -87,7 +87,7 @@ stdenv.mkDerivation rec {
     sha256 = "1c62mw9rnzq0rs3ihbhfs18nv4mdzwag7893hlqgji3wmaai70pk";
   };
   buildInputs = [
-    ocaml findlib ocamlbuild ppx_sexp_conv topkg result cstruct sexplib
+    ocaml findlib ocamlbuild ppx_sexp_conv topkg ocaml-result cstruct sexplib
     asn1-combinators ptime nocrypto astring ]
   ++
   stdenv.lib.optional
@@ -97,7 +97,7 @@ stdenv.mkDerivation rec {
   [
     cstruct-unix ];
   propagatedBuildInputs = [
-    ocaml ppx_sexp_conv result cstruct sexplib asn1-combinators ptime
+    ocaml ppx_sexp_conv ocaml-result cstruct sexplib asn1-combinators ptime
     nocrypto astring ]
   ++
   stdenv.lib.optional

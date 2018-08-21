@@ -47,8 +47,8 @@
   "sha512=1e733e97318ab7ae0e0a64661f986166f4993fc4e650f290aae9738c0d39bf7e4e2baa88e07cd8181408c690909b2426313a007df63a705ef7cf04712f6cd885"
     ]
   }*/
-{ doCheck ? false, stdenv, opam, fetchurl, ocaml, jbuilder, result, fmt, uri,
-  cstruct, jsonm, lwt, ocamlgraph, hex, logs, astring, findlib }:
+{ doCheck ? false, stdenv, opam, fetchurl, ocaml, jbuilder, ocaml-result,
+  fmt, uri, cstruct, jsonm, lwt, ocamlgraph, hex, logs, astring, findlib }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.03.0") >= 0;
 assert (vcompare jbuilder "1.0+beta10") >= 0;
@@ -71,10 +71,10 @@ stdenv.mkDerivation rec {
     sha256 = "019di4cz0z65knl232rnwj26npnc1mqh8j71xbf0mav6x350g1w5";
   };
   buildInputs = [
-    ocaml jbuilder result fmt uri cstruct jsonm lwt ocamlgraph hex logs
+    ocaml jbuilder ocaml-result fmt uri cstruct jsonm lwt ocamlgraph hex logs
     astring findlib ];
   propagatedBuildInputs = [
-    ocaml jbuilder result fmt uri cstruct jsonm lwt ocamlgraph hex logs
+    ocaml jbuilder ocaml-result fmt uri cstruct jsonm lwt ocamlgraph hex logs
     astring ];
   configurePhase = "true";
   buildPhase = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")

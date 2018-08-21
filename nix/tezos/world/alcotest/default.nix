@@ -47,7 +47,7 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, jbuilder, fmt, astring,
-  result, cmdliner, findlib }:
+  ocaml-result, cmdliner, findlib }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.02.3") >= 0;
 assert (vcompare jbuilder "1.0+beta10") >= 0;
@@ -64,9 +64,9 @@ stdenv.mkDerivation rec {
     sha256 = "0msk0c429d22b14zpl09fj222nmky6zz5c6vqbk5gbyr638r74xn";
   };
   buildInputs = [
-    ocaml jbuilder fmt astring result cmdliner findlib ];
+    ocaml jbuilder fmt astring ocaml-result cmdliner findlib ];
   propagatedBuildInputs = [
-    ocaml jbuilder fmt astring result cmdliner ];
+    ocaml jbuilder fmt astring ocaml-result cmdliner ];
   configurePhase = "true";
   buildPhase = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")
   [

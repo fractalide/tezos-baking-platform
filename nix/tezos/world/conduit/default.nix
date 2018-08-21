@@ -78,7 +78,7 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, jbuilder, ppx_sexp_conv,
-  sexplib, astring, uri, result, logs, ipaddr, findlib }:
+  sexplib, astring, uri, ocaml-result, logs, ipaddr, findlib }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.03.0") >= 0;
 assert (vcompare jbuilder "1.0+beta9") >= 0;
@@ -96,10 +96,10 @@ stdenv.mkDerivation rec {
     sha256 = "0jwqdx006szywij4m7kl1d95krg2s5dibk700lvblbrl81kyk9ab";
   };
   buildInputs = [
-    ocaml jbuilder ppx_sexp_conv sexplib astring uri result logs ipaddr
+    ocaml jbuilder ppx_sexp_conv sexplib astring uri ocaml-result logs ipaddr
     findlib ];
   propagatedBuildInputs = [
-    ocaml jbuilder ppx_sexp_conv sexplib astring uri result logs ipaddr ];
+    ocaml jbuilder ppx_sexp_conv sexplib astring uri ocaml-result logs ipaddr ];
   configurePhase = "true";
   buildPhase = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")
   [

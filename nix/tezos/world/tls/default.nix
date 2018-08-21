@@ -112,7 +112,7 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, ocamlbuild, topkg,
-  ppx_sexp_conv, ppx_deriving, ppx_cstruct, result, cstruct, sexplib,
+  ppx_sexp_conv, ppx_deriving, ppx_cstruct, ocaml-result, cstruct, sexplib,
   nocrypto, x509, cstruct-unix ? null, ounit ? null, lwt ? null,
   mirage-flow-lwt ? null, mirage-kv-lwt ? null, mirage-clock ? null,
   ptime ? null, astring ? null }:
@@ -140,7 +140,7 @@ stdenv.mkDerivation rec {
   };
   buildInputs = [
     ocaml findlib ocamlbuild topkg ppx_sexp_conv ppx_deriving ppx_cstruct
-    result cstruct sexplib nocrypto x509 cstruct-unix ]
+    ocaml-result cstruct sexplib nocrypto x509 cstruct-unix ]
   ++
   stdenv.lib.optional
   doCheck
@@ -182,7 +182,7 @@ stdenv.mkDerivation rec {
   null)
   astring;
   propagatedBuildInputs = [
-    ocaml ppx_sexp_conv ppx_deriving ppx_cstruct result cstruct sexplib
+    ocaml ppx_sexp_conv ppx_deriving ppx_cstruct ocaml-result cstruct sexplib
     nocrypto x509 cstruct-unix ]
   ++
   stdenv.lib.optional

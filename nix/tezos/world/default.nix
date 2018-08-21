@@ -85,7 +85,7 @@
   ppx_type_conv = self.callPackage ./ppx_type_conv {};
   ptime = self.callPackage ./ptime {};
   re = self.callPackage ./re {};
-  result = self.callPackage ./result {};
+  ocaml-result = self.callPackage ./ocaml-result {};
   rresult = self.callPackage ./rresult {};
   sexplib = self.callPackage ./sexplib {};
   stdio = self.callPackage ./stdio {};

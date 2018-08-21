@@ -55,8 +55,8 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, ocamlbuild, findlib, cppo,
-  cppo_ocamlbuild, ocaml-migrate-parsetree, ppx_derivers, ppx_tools, result,
-  ounit ? null }:
+  cppo_ocamlbuild, ocaml-migrate-parsetree, ppx_derivers, ppx_tools,
+  ocaml-result, ounit ? null }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.03.0") > 0;
 assert (vcompare findlib "1.6.0") >= 0;
@@ -74,13 +74,13 @@ stdenv.mkDerivation rec {
   };
   buildInputs = [
     ocaml ocamlbuild findlib cppo cppo_ocamlbuild ocaml-migrate-parsetree
-    ppx_derivers ppx_tools result ]
+    ppx_derivers ppx_tools ocaml-result ]
   ++
   stdenv.lib.optional
   doCheck
   ounit;
   propagatedBuildInputs = [
-    ocaml findlib ocaml-migrate-parsetree ppx_derivers ppx_tools result ]
+    ocaml findlib ocaml-migrate-parsetree ppx_derivers ppx_tools ocaml-result ]
   ++
   stdenv.lib.optional
   doCheck

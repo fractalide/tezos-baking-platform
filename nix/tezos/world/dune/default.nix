@@ -32,7 +32,7 @@
     "jbuilder" {!= "transition"}
   ]
   build: [
-    ["ocaml" "configure.ml"]
+    ["ocaml" "configure.ml" "--libdir" lib]
     ["ocaml" "bootstrap.ml"]
     ["./boot.exe" "--release" "--subst"] {pinned}
     ["./boot.exe" "--release" "-j" jobs]
@@ -68,9 +68,11 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = [
     ocaml fauxpam ];
   configurePhase = "true";
+  patches = [
+    ./dune-libdir.patch ];
   buildPhase = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")
   [
-    [ "'ocaml'" "'configure.ml'" ] [
+    [ "'ocaml'" "'configure.ml'" "'--libdir'" "$OCAMLFIND_DESTDIR" ] [
       "'ocaml'" "'bootstrap.ml'" ]
     [ "'./boot.exe'" "'--release'" "'-j'" "1" ] ];
   preInstall = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")

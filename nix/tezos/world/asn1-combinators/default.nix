@@ -57,7 +57,7 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, ocamlbuild, topkg,
-  result, cstruct, zarith, ptime, ounit ? null }:
+  ocaml-result, cstruct, zarith, ptime, ounit ? null }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.02.0") >= 0;
 assert !((vcompare cstruct "1.6.0") < 0);
@@ -73,13 +73,13 @@ stdenv.mkDerivation rec {
     sha256 = "1cgkrx13bvkxa66qparv3ginx7ycdincx3n6jgrym62g945pz78h";
   };
   buildInputs = [
-    ocaml findlib ocamlbuild topkg result cstruct zarith ptime ]
+    ocaml findlib ocamlbuild topkg ocaml-result cstruct zarith ptime ]
   ++
   stdenv.lib.optional
   doCheck
   ounit;
   propagatedBuildInputs = [
-    ocaml result cstruct zarith ptime ]
+    ocaml ocaml-result cstruct zarith ptime ]
   ++
   stdenv.lib.optional
   doCheck

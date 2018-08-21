@@ -57,8 +57,8 @@
   "sha512=10c4af2dfae0757686179ca2ff843add95d6f911121a345ab7fbf2aa901e0384b2aaf5152e04328edc791fd0b9fa81886a398d80f056f9dc3fad7280916bf052"
     ]
   }*/
-{ doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, ocamlbuild, result
-  }:
+{ doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, ocamlbuild,
+  ocaml-result }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.01.0") >= 0;
 assert (vcompare findlib "1.6.1") >= 0;
@@ -74,9 +74,9 @@ stdenv.mkDerivation rec {
     sha256 = "1slrzbmyp81xhgsfwwqs2d6gxzvqx0gcp34rq00h5iblhcq7myx6";
   };
   buildInputs = [
-    ocaml findlib ocamlbuild result ];
+    ocaml findlib ocamlbuild ocaml-result ];
   propagatedBuildInputs = [
-    ocaml findlib ocamlbuild result ];
+    ocaml findlib ocamlbuild ocaml-result ];
   configurePhase = "true";
   buildPhase = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")
   [

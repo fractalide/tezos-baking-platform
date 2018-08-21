@@ -64,7 +64,7 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, ocamlbuild, topkg,
-  ocb-stubblr, result }:
+  ocb-stubblr, ocaml-result }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.01.0") >= 0;
 assert !((vcompare ocb-stubblr "0.1.0") < 0);
@@ -80,9 +80,9 @@ stdenv.mkDerivation rec {
     sha256 = "0bl6094glf6551qsl8syxn08hyji6jsg286l84dq5g7djr2z8ykx";
   };
   buildInputs = [
-    ocaml findlib ocamlbuild topkg ocb-stubblr result ];
+    ocaml findlib ocamlbuild topkg ocb-stubblr ocaml-result ];
   propagatedBuildInputs = [
-    ocaml result ];
+    ocaml ocaml-result ];
   configurePhase = "true";
   buildPhase = stdenv.lib.concatMapStringsSep "\n" (stdenv.lib.concatStringsSep " ")
   [

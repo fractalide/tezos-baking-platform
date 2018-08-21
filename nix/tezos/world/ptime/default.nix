@@ -59,7 +59,7 @@
     ]
   }*/
 { doCheck ? false, stdenv, opam, fetchurl, ocaml, findlib, ocamlbuild, topkg,
-  result, js_of_ocaml ? null }:
+  ocaml-result, js_of_ocaml ? null }:
 let vcompare = stdenv.lib.versioning.debian.version.compare; in
 assert (vcompare ocaml "4.01.0") >= 0;
 
@@ -74,7 +74,7 @@ stdenv.mkDerivation rec {
     sha256 = "18jimskgnd9izg7kn6zk6sk35adgjm605dkv13plwslbb90kqr44";
   };
   buildInputs = [
-    ocaml findlib ocamlbuild topkg result ]
+    ocaml findlib ocamlbuild topkg ocaml-result ]
   ++
   stdenv.lib.optional
   (js_of_ocaml
@@ -82,7 +82,7 @@ stdenv.mkDerivation rec {
   null)
   js_of_ocaml;
   propagatedBuildInputs = [
-    ocaml result ]
+    ocaml ocaml-result ]
   ++
   stdenv.lib.optional
   (js_of_ocaml
