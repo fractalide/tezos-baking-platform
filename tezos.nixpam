@@ -3,9 +3,9 @@ world-path: "nix/tezos/world/default.nix"
 include: ["*"]
 skip: ["ocaml-base-compiler"]
 custom: [
-  "nix/opam2.nix" { name = "opam" }
-  "nix/conf-libev" { name = "conf-libev" }
-  "nix/nocrypto" { name = "nocrypto" }
+  "nix/tezos/opam.nix" { name = "opam" }
+  "nix/custom/conf-libev" { name = "conf-libev" }
+  "nix/custom/nocrypto" { name = "nocrypto" }
 ]
 inherit: [
   "pkgs.ocaml-ng.ocamlPackages_4_06" { name = "ocaml" | name = "ocamlfind" }
