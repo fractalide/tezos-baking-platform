@@ -7,7 +7,7 @@
 , psmisc
 , jq
 , bash
-, tezos
+, kit
 , tezos-src
 , tezos-loadtest
 } : stdenv.mkDerivation {
@@ -17,7 +17,7 @@
 
   configurePhase = "true";
   installPhase = "true";
-  nativeBuildInputs = [psmisc jq tezos];
+  nativeBuildInputs = [psmisc jq kit];
   buildInputs = [bash tezos-loadtest];
   buildPhase = ''
     mkdir -p $out/bin
@@ -39,19 +39,19 @@
 
       declare -a node_args
       node_args=("--config-file=$out/node-$nodeid/config.json"
-	  "--data-dir=${data_dir}/node-$nodeid"
-	  "--rpc-addr=0.0.0.0:$((18730 + nodeid))"
-	  "--net-addr=127.0.0.1:$((19730 + nodeid))"
-	  "--expected-pow=${expected_pow}"
-	  "--private-mode"
-	  "--no-bootstrap-peers"
-	  "--connections=${expected_connections}"
-	  "--log-output=${data_dir}/node-$nodeid.log"
-	  )
+          "--data-dir=${data_dir}/node-$nodeid"
+          "--rpc-addr=0.0.0.0:$((18730 + nodeid))"
+          "--net-addr=127.0.0.1:$((19730 + nodeid))"
+          "--expected-pow=${expected_pow}"
+          "--private-mode"
+          "--no-bootstrap-peers"
+          "--connections=${expected_connections}"
+          "--log-output=${data_dir}/node-$nodeid.log"
+          )
       for peerid in $(seq 1 ${max_peer_id}) ; do
-	node_args=("''${node_args[@]}" "--peer=127.0.0.1:$((19730 + peerid))")
+        node_args=("''${node_args[@]}" "--peer=127.0.0.1:$((19730 + peerid))")
       done
-      ${tezos}/bin/tezos-node config init "''${node_args[@]}"
+      ${kit}/bin/tezos-node config init "''${node_args[@]}"
     done
 
     cat > $out/bin/sandbox-env.inc.sh << EOF_ENVIRON
@@ -75,15 +75,15 @@
     #/usr/bin/env bash
       set -xe
       bootstrap_secrets=(
-	"edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
-	"edsk39qAm1fiMjgmPkw1EgQYkMzkJezLNewd7PLNHTkr6w9XA2zdfo"
-	"edsk4ArLQgBTLWG5FJmnGnT689VKoqhXwmDPBuGx3z4cvwU9MmrPZZ"
-	"edsk2uqQB9AY4FvioK2YMdfmyMrer5R8mGFyuaLLFfSRo8EoyNdht3"
-	"edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm"
+        "edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
+        "edsk39qAm1fiMjgmPkw1EgQYkMzkJezLNewd7PLNHTkr6w9XA2zdfo"
+        "edsk4ArLQgBTLWG5FJmnGnT689VKoqhXwmDPBuGx3z4cvwU9MmrPZZ"
+        "edsk2uqQB9AY4FvioK2YMdfmyMrer5R8mGFyuaLLFfSRo8EoyNdht3"
+        "edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm"
       )
 
       for i in "\''${!bootstrap_secrets[@]}" ; do
-	$out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i unencrypted:"\''${bootstrap_secrets[i]}"
+        $out/bin/tezos-sandbox-client.sh import secret key bootstrap\$i unencrypted:"\''${bootstrap_secrets[i]}"
       done
 
       $out/bin/tezos-sandbox-client.sh import secret key dictator "unencrypted:edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
@@ -93,15 +93,15 @@
     cat > $out/bin/bootstrap-alphanet.sh <<EOF_ALPHANET
     #/usr/bin/env bash
       while ! $out/bin/tezos-sandbox-client.sh bootstrapped ; do
-	  echo "waiting for network"
-	  sleep 1
+          echo "waiting for network"
+          sleep 1
       done
       $out/bin/tezos-sandbox-client.sh \
-	  -block genesis \
-	  activate protocol PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY \
-	  with fitness ${expected_pow} \
-	  and key dictator \
-	  and parameters ${data_dir}/protocol_parameters.json
+          -block genesis \
+          activate protocol PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY \
+          with fitness ${expected_pow} \
+          and key dictator \
+          and parameters ${data_dir}/protocol_parameters.json
 
       # TODO: This should not be neccessary; the daemon should be able to bake block 1...
       # FIRST_BAKER="\$($out/bin/tezos-sandbox-client.sh rpc get /chains/main/blocks/head/helpers/baking_rights | jq '.[0].delegate' -r)"
@@ -117,11 +117,11 @@
     declare -a utilities
     declare -a nix_paths
     utilities=(baker-alpha endorser-alpha signer accuser-alpha client)
-    nix_paths=(${tezos})
+    nix_paths=(${kit} ${kit} ${kit} ${kit} ${kit})
     for i in "''${!utilities[@]}"; do
-	utility="''${utilities[$i]}"
-	nix_path="''${nix_paths[$i]}"
-	cat > $out/bin/tezos-sandbox-$utility.sh <<EOF_CLIENT
+        utility="''${utilities[$i]}"
+        nix_path="''${nix_paths[$i]}"
+        cat > $out/bin/tezos-sandbox-$utility.sh <<EOF_CLIENT
     #!/usr/bin/env bash
     set -ex
     exec "$nix_path"/bin/tezos-$utility "--config-file" "$out/client/config" "\$@"
@@ -138,18 +138,18 @@
 
     mkdir -p "${data_dir}/node-\$nodeid"
     if [ ! -f "${data_dir}/node-\$nodeid/identity.json" ] ; then
-      ${tezos}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+      ${kit}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
     fi
 
     # logfile is already redirected by config
     if [ "\$1" == "run" ] ; then
       node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json")
       for peerid in \$(seq 1 ${max_peer_id}) ; do
-	node_args=("\''${node_args[@]}" "--peer=127.0.0.1:\$((19730 + peerid))")
+        node_args=("\''${node_args[@]}" "--peer=127.0.0.1:\$((19730 + peerid))")
       done
     fi;
 
-    exec ${tezos}/bin/tezos-node "\$@" "\''${node_args[@]}"
+    exec ${kit}/bin/tezos-node "\$@" "\''${node_args[@]}"
     EOF_NODE
 
     # as above, but creates a fragile network where the loss of peer 1 causes a split-brain situation.
@@ -170,7 +170,7 @@
 
     mkdir -p "$out/node-$nodeid"
     if [ ! -f "${data_dir}/node-\$nodeid/identity.json" ] ; then
-      ${tezos}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
+      ${kit}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
     fi
 
     left_hemisphere=($(seq 2 2 ${max_peer_id}) )
@@ -183,15 +183,15 @@
     if [ "\$1" == "run" ] ; then
       node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json" "--closed" "--no-bootstrap-peers")
       if [ "\$nodeid" -eq 1 ] ; then
-	node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${fragile_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${fragile_peers[@]}" ; do echo \$((19730 + i)) ; done)))
       elif [ \$(( "\$nodeid" % 2 )) -eq 0 ] ; then
-	node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${left_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${left_peers[@]}" ; do echo \$((19730 + i)) ; done)))
       else
-	node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${right_peers[@]}" ; do echo \$((19730 + i)) ; done)))
+        node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${right_peers[@]}" ; do echo \$((19730 + i)) ; done)))
       fi
     fi
 
-    exec ${tezos}/bin/tezos-node "\$@" "\''${node_args[@]}"
+    exec ${kit}/bin/tezos-node "\$@" "\''${node_args[@]}"
     EOF_FRAGILENODE
 
 
@@ -235,23 +235,23 @@
     set -eux
 
     for i in \$(seq 1 "\$#") ; do
-	echo "LAUNCH BAKER:" "\''${!i}"
+        echo "LAUNCH BAKER:" "\''${!i}"
 
-	# TODO ADD THIS BACK WHEN !424 is merged
-	# -M --monitor-port \$((17730+\$i))
-	$out/bin/tezos-sandbox-baker-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run with local node "${data_dir}/node-\$i" "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
-	sleep 1
-	if ! kill -0 \$pid; then
-	    echo >&2 "Problem launching baker: \$pid"
-	    false
-	fi
+        # TODO ADD THIS BACK WHEN !424 is merged
+        # -M --monitor-port \$((17730+\$i))
+        $out/bin/tezos-sandbox-baker-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run with local node "${data_dir}/node-\$i" "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+        sleep 1
+        if ! kill -0 \$pid; then
+            echo >&2 "Problem launching baker: \$pid"
+            false
+        fi
 
-	$out/bin/tezos-sandbox-endorser-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
-	sleep 1
-	if ! kill -0 \$pid; then
-	    echo >&2 "Problem launching endorser: \$pid"
-	    false
-	fi
+        $out/bin/tezos-sandbox-endorser-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+        sleep 1
+        if ! kill -0 \$pid; then
+            echo >&2 "Problem launching endorser: \$pid"
+            false
+        fi
     done
     EOF_MONITBAKER
 
@@ -268,10 +268,10 @@
       blockhead="\$(tezos-sandbox-client.sh rpc get /chains/main/blocks/head 2>/dev/null)"
       blockhead_ok=\$?
       if [ \$blockhead_ok -eq 0 -a 3 -le "\$(jq '.header.level' <<< "\$blockhead")" ] ; then
-	break
+        break
       else
-	echo "waiting for progress"
-	sleep 1
+        echo "waiting for progress"
+        sleep 1
       fi
     done
 

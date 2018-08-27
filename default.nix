@@ -4,10 +4,21 @@ pkgs.lib.makeScope pkgs.newScope (self:
 let
   inherit (self) callPackage;
   inherit pkgs;
-  inherit (pkgs) lib fetchgit;
+  inherit (pkgs) lib fetchgit haskell;
 in
 rec {
   pkgs = self;
+
+  combineOverrides = old: new: (old // new) // {
+    overrides = lib.composeExtensions old.overrides new.overrides;
+  };
+  makeRecursivelyOverridable = x: old: x.override old // {
+    override = new: makeRecursivelyOverridable x (combineOverrides old new);
+  };
+
+  haskellPackages = makeRecursivelyOverridable haskell.packages.ghc822 { overrides = self: super: {
+    "ListLike" = haskell.lib.addBuildDepends super.ListLike [ self.semigroups ];
+  }; };
 
   fetchThunk = p: if builtins.pathExists (p + /git.json)
     then fetchgit { inherit (builtins.fromJSON (builtins.readFile (p + /git.json))) url rev sha256; }
@@ -22,13 +33,9 @@ rec {
     betanet = callPackage nix/tezos { tezos-src = fetchThunk tezos/betanet; tezos-world-path = nix/tezos/betanet/world; };
   };
 
-  tezos-bake-monitor = callPackage ./tezos-bake-monitor/tezos-bake-monitor {
-    inherit pkgs;
-  };
+  tezos-bake-monitor = callPackage ./tezos-bake-monitor/tezos-bake-monitor { };
 
-  tezos-loadtest = callPackage ./tezos-load-testing {
-    inherit pkgs;
-  };
+  tezos-loadtest = callPackage ./tezos-load-testing { };
 
   tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central {}).exe;
 

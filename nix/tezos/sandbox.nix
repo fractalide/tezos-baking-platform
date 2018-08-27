@@ -3,13 +3,14 @@
 , max_peer_id ? "9"
 , expected_connections ? "3"
 , time_between_blocks ? ''["5"]''
-, tezos
+, kit
 , tezos-loadtest
 , psmisc
 , jq
 , sandbox-env
+, stdenv
+} : stdenv.mkDerivation {
 # TODO: protocol parameters, especially time_between_blocks
- : pkgs.stdenv.mkDerivation {
   name = "tezos-sandbox-sandbox";
   src = null;
   doUnpack = false;
@@ -19,7 +20,7 @@
     (sandbox-env {
       inherit expected_pow data_dir max_peer_id expected_connections time_between_blocks;
     })
-    tezos
+    kit
     tezos-loadtest
     psmisc
     jq
