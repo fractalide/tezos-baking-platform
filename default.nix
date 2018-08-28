@@ -4,7 +4,7 @@ pkgs.lib.makeScope pkgs.newScope (self:
 let
   inherit (self) callPackage;
   inherit pkgs;
-  inherit (pkgs) lib fetchgit haskell;
+  inherit (pkgs) lib fetchgit haskell dockerTools;
 in
 rec {
   pkgs = self;
@@ -40,10 +40,10 @@ rec {
   tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central {}).exe;
 
   bake-central-docker = let
-    bakeCentralSetupScript = pkgs.dockerTools.shellScript "dockersetup.sh" ''
+    bakeCentralSetupScript = dockerTools.shellScript "dockersetup.sh" ''
       set -ex
 
-      ${pkgs.dockerTools.shadowSetup}
+      ${dockerTools.shadowSetup}
       echo 'nobody:x:99:99:Nobody:/:/sbin/nologin' >> /etc/passwd
       echo 'nobody:*:17416:0:99999:7:::'           >> /etc/shadow
       echo 'nobody:x:99:'                          >> /etc/group
@@ -52,7 +52,7 @@ rec {
       mkdir -p    /var/run/bake-monitor
       chown 99:99 /var/run/bake-monitor
     '';
-    bakeCentralEntrypoint = pkgs.dockerTools.shellScript "entrypoint.sh" ''
+    bakeCentralEntrypoint = dockerTools.shellScript "entrypoint.sh" ''
       set -ex
 
       mkdir -p /var/run/bake-monitor
@@ -63,7 +63,7 @@ rec {
       cd /var/run/bake-monitor
       exec ./backend "$@"
     '';
-  in pkgs.dockerTools.buildImage {
+  in dockerTools.buildImage {
     name = "tezos-bake-monitor";
     runAsRoot = bakeCentralSetupScript;
     keepContentsDirlinks = true;
