@@ -1,10 +1,10 @@
-{ pkgs ? import nix/nixpkgs.nix {}
+{ nixpkgs ? import nix/nixpkgs.nix {}
 }:
-pkgs.lib.makeScope pkgs.newScope (self:
+nixpkgs.lib.makeScope nixpkgs.newScope (self:
 let
   inherit (self) callPackage;
-  inherit pkgs;
-  inherit (pkgs) lib fetchgit haskell dockerTools;
+  pkgs = nixpkgs;
+  inherit (nixpkgs) lib fetchgit haskell dockerTools runCommand;
 in
 rec {
   pkgs = self;
@@ -37,7 +37,7 @@ rec {
 
   tezos-loadtest = callPackage ./tezos-load-testing { };
 
-  tezos-bake-central = (import ./tezos-bake-monitor/tezos-bake-central {}).exe;
+  tezos-bake-central = (nixpkgs.callPackage ./tezos-bake-monitor/tezos-bake-central/release.nix {}).releaseExe;
 
   bake-central-docker = let
     bakeCentralSetupScript = dockerTools.shellScript "dockersetup.sh" ''
@@ -65,9 +65,16 @@ rec {
     '';
   in dockerTools.buildImage {
     name = "tezos-bake-monitor";
+    contents = [ nixpkgs.iana-etc nixpkgs.cacert ];
     runAsRoot = bakeCentralSetupScript;
     keepContentsDirlinks = true;
     config = {
+     Env = [
+        ("PATH=" + builtins.concatStringsSep(":")([
+          "${nixpkgs.stdenv.shellPackage}/bin"
+          "${nixpkgs.coreutils}/bin"
+        ]))
+      ];
       Expose = 8000;
       Entrypoint = [bakeCentralEntrypoint];
       User = "99:99";
