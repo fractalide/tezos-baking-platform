@@ -1,0 +1,35 @@
+opam-version: "2.0"
+world-path: "nix/tezos/world/default.nix"
+include: ["*"]
+skip: ["ocaml-base-compiler"]
+custom: [
+  "nix/tezos/opam.nix" { name = "opam" }
+  "nix/custom/conf-libev" { name = "conf-libev" }
+  "nix/custom/nocrypto" { name = "nocrypto" }
+]
+inherit: [
+  "pkgs.ocaml-ng.ocamlPackages_4_06" { name = "ocaml" | name = "ocamlfind" }
+]
+attribute-name: [
+  "findlib" { name = "ocamlfind" }
+  "ocaml-hidapi" { name = "hidapi" }
+  "ocaml-result" { name = "result" }
+]
+expression-path: [
+  "nix/tezos/world/%{attribute}%/default.nix"
+]
+depexts: [
+  ["ncurses"] { name = "lwt" }
+  ["gmp"] { name = "conf-gmp" }
+  ["libev"] { name = "conf-libev" }
+  ["pkgconfig"] { name = "conf-pkg-config" }
+  ["pkgconfig"] { name = "hidapi" }
+  ["hidapi"] { name = "conf-hidapi" }
+  ["fauxpam"] { name = "dune" }
+]
+patches: [
+  "patches/pkg-config.patch" { name = "ocb-stubblr" }
+  "patches/ocp-ocamlres.patch" { name = "ocp-ocamlres" }
+  "patches/ppx_deriving.patch" { name = "ppx_deriving" }
+  "patches/dune-libdir.patch" { name = "dune" }
+]

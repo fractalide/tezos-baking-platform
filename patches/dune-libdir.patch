@@ -1,0 +1,12 @@
+diff --git a/configure.ml b/configure.ml
+index 4e2cbcb0..40532b95 100644
+--- a/configure.ml
++++ b/configure.ml
+@@ -23,6 +23,7 @@ let () =
+     library_path    := Some [dir];
+     library_destdir := Some dir
+   in
++  let set_libdir s = () in
+   let args =
+     [ "--libdir", Arg.String set_libdir,
+       "DIR where installed libraries are for the default build context"

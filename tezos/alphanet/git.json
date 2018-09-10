@@ -1,0 +1,7 @@
+{
+  "url": "https://gitlab.com/obsidian.systems/tezos.git",
+  "rev": "7f5f5632ec6e5fe5341653f3050308cc978b0b9f",
+  "sha256": "12fhgjbqd2nsvixwncsqjf9wjivyc3zl58vj9qzqpf4lg04bdfpa",
+  "fetchSubmodules": false,
+  "branch": "alphanet"
+}
