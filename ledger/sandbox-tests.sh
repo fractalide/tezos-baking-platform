@@ -4,7 +4,7 @@ set -eu
 cd "$(dirname "$0")"/..
 
 export TEZOS_CLIENT_UNSAFE_DISABLE_DISCLAIMER=Y
-scripts/ledger-start.sh
+ledger/sandbox-init.sh
 
 attempt() {
     echo "$@"
