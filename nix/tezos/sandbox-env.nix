@@ -90,15 +90,28 @@
       cp $out/protocol_parameters.json "${data_dir}"
     EOF_BOOTSTRAP
 
+    version=$(find ${builtins.head kit.srcs} -name TEZOS_PROTOCOL |
+      grep /proto_ |
+      cut -f2 -d_ |
+      grep -vi -e demo -e genesis |
+      sort -n |
+      tac |
+      head -n1)
+    proto="$(find ${builtins.head kit.srcs} -name TEZOS_PROTOCOL |
+      grep "$version" |
+      xargs jq .hash |
+      sed 's/"//g')"
+
     cat > $out/bin/bootstrap-alphanet.sh <<EOF_ALPHANET
     #/usr/bin/env bash
+      echo "Using version: $version"
       while ! $out/bin/tezos-sandbox-client.sh bootstrapped ; do
           echo "waiting for network"
           sleep 1
       done
       $out/bin/tezos-sandbox-client.sh \
           -block genesis \
-          activate protocol PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY \
+          activate protocol $proto \
           with fitness ${expected_pow} \
           and key dictator \
           and parameters ${data_dir}/protocol_parameters.json
