@@ -16,4 +16,4 @@ $ $(nix-build -A tezos.<network>.kit --no-out-link)/bin/tezos-node run --rpc-add
 
 The `--rpc-addr` option opens the RPC port the node listens on. The `--data-dir` is where identity and chain data are stored. You'll need to use the `--data-dir` command so `tezos-node` knows where to find the correct directory.
 
-To see all available binaries, run `$(nix-build -A tezos.<network>.kit --no-out-link)/bin/`, where `<network>` is the network used during your `nix-build`.
+To see all available binaries, run `ls $(nix-build -A tezos.<network>.kit --no-out-link)/bin/`, where `<network>` is the network used during your `nix-build`.
