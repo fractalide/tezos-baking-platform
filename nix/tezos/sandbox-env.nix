@@ -129,15 +129,14 @@
     set -eux
     declare -a utilities
     declare -a nix_paths
-    utilities=(baker-alpha endorser-alpha signer accuser-alpha client)
-    nix_paths=(${kit} ${kit} ${kit} ${kit} ${kit})
+    utilities=(baker endorser signer accuser client)
     for i in "''${!utilities[@]}"; do
         utility="''${utilities[$i]}"
-        nix_path="''${nix_paths[$i]}"
+        exe_path=$(find '${kit}'/bin -name "tezos-$utility*")
         cat > $out/bin/tezos-sandbox-$utility.sh <<EOF_CLIENT
     #!/usr/bin/env bash
     set -ex
-    exec "$nix_path"/bin/tezos-$utility "--config-file" "$out/client/config" "\$@"
+    exec $exe_path --config-file "$out/client/config" "\$@"
     EOF_CLIENT
     done
     set +x
@@ -160,7 +159,7 @@
       for peerid in \$(seq 1 ${max_peer_id}) ; do
         node_args=("\''${node_args[@]}" "--peer=127.0.0.1:\$((19730 + peerid))")
       done
-    fi;
+    fi
 
     exec ${kit}/bin/tezos-node "\$@" "\''${node_args[@]}"
     EOF_NODE
@@ -181,7 +180,7 @@
 
     node_args=("--config-file=$out/node-\$nodeid/config.json")
 
-    mkdir -p "$out/node-$nodeid"
+    mkdir -p "${data_dir}/node-\$nodeid"
     if [ ! -f "${data_dir}/node-\$nodeid/identity.json" ] ; then
       ${kit}/bin/tezos-node identity generate ${expected_pow} "\''${node_args[@]}"
     fi
@@ -194,7 +193,7 @@
 
     # logfile is already redirected by config
     if [ "\$1" == "run" ] ; then
-      node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json" "--closed" "--no-bootstrap-peers")
+      node_args=("\''${node_args[@]}" "--sandbox=$out/sandbox.json" "--private-mode" "--no-bootstrap-peers")
       if [ "\$nodeid" -eq 1 ] ; then
         node_args=("\''${node_args[@]}" \$(printf -- "--peer=127.0.0.1:%s\n" \$(for i in "\''${fragile_peers[@]}" ; do echo \$((19730 + i)) ; done)))
       elif [ \$(( "\$nodeid" % 2 )) -eq 0 ] ; then
@@ -216,14 +215,22 @@
     for nodeid in \$(seq 1 ${max_peer_id}) ; do
       \$node_exe \$nodeid run &
     done
+
+    for i in \$(seq 1 ${max_peer_id}) ; do
+      node_rpc_port=\$(((i - 1) % ${max_peer_id} + 18731))
+      while ! curl "http://127.0.0.1:\$node_rpc_port/chains/main/blocks/head/metadata" ; do
+        echo "Waiting for node to start RPC on port \$node_rpc_port"
+        sleep 1
+      done
+    done
     EOF_NETWORK
 
     cat > $out/bin/bootstrap-baking.sh << EOF_BOOTBAKE
     #!/usr/bin/env bash
     set -ex
     for bootstrapid in \$(seq 1 "\''${1:-3}") ; do
-      $out/bin/tezos-sandbox-baker-alpha.sh run with local node "${data_dir}/node-\$bootstrapid" bootstrap\$bootstrapid >${data_dir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
-      $out/bin/tezos-sandbox-endorser-alpha.sh run bootstrap\$bootstrapid >${data_dir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+      $out/bin/tezos-sandbox-baker.sh run with local node "${data_dir}/node-\$bootstrapid" bootstrap\$bootstrapid >${data_dir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
+      $out/bin/tezos-sandbox-endorser.sh run bootstrap\$bootstrapid >${data_dir}/clientd-bootstrap\$bootstrapid.log 2>&1 &
       # We would run an accuser, but we are not economically motivated to.
     done
     EOF_BOOTBAKE
@@ -252,14 +259,17 @@
 
         # TODO ADD THIS BACK WHEN !424 is merged
         # -M --monitor-port \$((17730+\$i))
-        $out/bin/tezos-sandbox-baker-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run with local node "${data_dir}/node-\$i" "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+        node_rpc_port=\$(((i - 1) % ${max_peer_id} + 18731))
+
+        $out/bin/tezos-sandbox-baker.sh -A 127.0.0.1 -P \$node_rpc_port run with local node "${data_dir}/node-\$i" "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+
         sleep 1
         if ! kill -0 \$pid; then
             echo >&2 "Problem launching baker: \$pid"
             false
         fi
 
-        $out/bin/tezos-sandbox-endorser-alpha.sh -A 127.0.0.1 -P \$(((i - 1) % ${max_peer_id} + 18731)) run "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
+        $out/bin/tezos-sandbox-endorser.sh -A 127.0.0.1 -P \$node_rpc_port run "\''${!i}" >${data_dir}/clientd-bootstrap\$i.log 2>&1 & pid=\$!
         sleep 1
         if ! kill -0 \$pid; then
             echo >&2 "Problem launching endorser: \$pid"
