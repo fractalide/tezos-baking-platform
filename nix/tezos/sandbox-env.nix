@@ -13,7 +13,7 @@
 } : stdenv.mkDerivation {
   name = "tezos-sandbox";
   sourceRoot = ".";
-  srcs = [ (tezos-src + /scripts) tezos-loadtest.src ];
+  srcs = [ (tezos-src + /scripts) ];
 
   configurePhase = "true";
   installPhase = "true";
@@ -29,7 +29,7 @@
       > $out/protocol_parameters.json
 
     # TODO: Set traders/bakers/nodes
-    cat < ./tezos-load-testing/config.json \
+    cat < ${tezos-loadtest.src}/config.json \
       | jq '._client_exe = $client' --arg client $out/bin/tezos-sandbox-client.sh \
       > $out/loadtest-config.json
 
