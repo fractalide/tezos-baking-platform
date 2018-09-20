@@ -36,7 +36,7 @@ rec {
 
   tezos-bake-monitor = callPackage ./tezos-bake-monitor/tezos-bake-monitor { };
 
-  tezos-loadtest = callPackage ./tezos-load-testing { };
+  tezos-loadtest = (import ./tezos-bake-monitor/tezos-bake-central/.obelisk/impl {}).reflex-platform.nixpkgs.haskellPackages.callCabal2nix "tezos-load-testing" ./tezos-load-testing {};
 
   tezos-bake-central = (nixpkgs.callPackage ./tezos-bake-monitor/tezos-bake-central/release.nix {}).releaseExe;
 
