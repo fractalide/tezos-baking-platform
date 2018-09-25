@@ -37,7 +37,7 @@ stdenv.mkDerivation rec {
   version = "0";
   name = "${pname}-${version}";
   inherit doCheck;
-  src = "/var/empty";
+  src = (import <nixpkgs> {}).runCommand "empty" {} "mkdir $out";
   buildInputs = [
     ocaml conf-pkg-config findlib hidapi ];
   propagatedBuildInputs = [
