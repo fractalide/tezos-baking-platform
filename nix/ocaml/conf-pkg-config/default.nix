@@ -47,7 +47,7 @@ stdenv.mkDerivation rec {
   version = "1.1";
   name = "${pname}-${version}";
   inherit doCheck;
-  src = "/var/empty";
+  src = (import <nixpkgs> {}).runCommand "empty" {} "mkdir $out";
   buildInputs = [
     ocaml findlib pkgconfig ];
   propagatedBuildInputs = [

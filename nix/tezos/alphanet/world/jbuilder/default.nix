@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
   version = "transition";
   name = "${pname}-${version}";
   inherit doCheck;
-  src = "/var/empty";
+  src = (import <nixpkgs> {}).runCommand "empty" {} "mkdir $out";
   buildInputs = [
     ocaml dune findlib ];
   propagatedBuildInputs = [

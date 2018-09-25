@@ -37,7 +37,7 @@ stdenv.mkDerivation rec {
   version = "4-11";
   name = "${pname}-${version}";
   inherit doCheck;
-  src = "/var/empty";
+  src = (import <nixpkgs> {}).runCommand "empty" {} "mkdir $out";
   postUnpack = "ln -sv ${./discover.ml} \"$sourceRoot\"/discover.ml\nln -sv ${./build.sh} \"$sourceRoot\"/build.sh";
   buildInputs = [ ocaml findlib libev ncurses ];
   propagatedBuildInputs = [ ocaml libev ];
