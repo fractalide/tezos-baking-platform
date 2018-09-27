@@ -37,7 +37,7 @@ rec {
 
   tezos-bake-monitor = callPackage tezos-bake-monitor-src { };
 
-  tezos-loadtest = (import "${tezos-bake-monitor-src}/tezos-bake-central/.obelisk/impl" {}).reflex-platform.nixpkgs.haskellPackages.callCabal2nix "tezos-load-testing" ./tezos-load-testing {};
+  tezos-loadtest = (import "${tezos-bake-monitor-src}/tezos-bake-central/.obelisk/impl" {}).reflex-platform.nixpkgs.haskellPackages.callCabal2nix "tezos-load-testing" (import ./nix/pins/tezos-load-testing) {};
 
   tezos-bake-central = (nixpkgs.callPackage "${tezos-bake-monitor-src}/tezos-bake-central/release.nix" {}).releaseExe;
 
