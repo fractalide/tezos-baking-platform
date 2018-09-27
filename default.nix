@@ -5,6 +5,7 @@ let
   inherit (self) callPackage;
   pkgs = nixpkgs;
   inherit (nixpkgs) lib fetchgit haskell dockerTools runCommand;
+  tezos-bake-monitor-src = import ./nix/pins/tezos-bake-monitor;
 in
 rec {
   pkgs = self;
@@ -34,11 +35,11 @@ rec {
     mainnet = callPackage nix/tezos { tezos-src = fetchThunk tezos/mainnet; tezos-world-path = nix/tezos/mainnet/world; };
   };
 
-  tezos-bake-monitor = callPackage ./tezos-bake-monitor/tezos-bake-monitor { };
+  tezos-bake-monitor = callPackage tezos-bake-monitor-src { };
 
-  tezos-loadtest = (import ./tezos-bake-monitor/tezos-bake-central/.obelisk/impl {}).reflex-platform.nixpkgs.haskellPackages.callCabal2nix "tezos-load-testing" ./tezos-load-testing {};
+  tezos-loadtest = (import "${tezos-bake-monitor-src}/tezos-bake-central/.obelisk/impl" {}).reflex-platform.nixpkgs.haskellPackages.callCabal2nix "tezos-load-testing" (import ./nix/pins/tezos-load-testing) {};
 
-  tezos-bake-central = (nixpkgs.callPackage ./tezos-bake-monitor/tezos-bake-central/release.nix {}).releaseExe;
+  tezos-bake-central = (nixpkgs.callPackage "${tezos-bake-monitor-src}/tezos-bake-central/release.nix" {}).releaseExe;
 
   bake-central-docker = let
     bakeCentralSetupScript = dockerTools.shellScript "dockersetup.sh" ''
