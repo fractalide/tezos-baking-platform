@@ -1,6 +1,3 @@
-[submodule "tezos-bake-monitor"]
-	path = tezos-bake-monitor
-	url = git@gitlab.com:obsidian.systems/tezos-bake-monitor.git
 [submodule "tezos-load-testing"]
 	path = tezos-load-testing
 	url = git@gitlab.com:obsidian.systems/tezos-load-testing.git
