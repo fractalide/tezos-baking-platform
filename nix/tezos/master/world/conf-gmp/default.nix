@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
   version = "1";
   name = "${pname}-${version}";
   inherit doCheck;
-  src = "/var/empty";
+  src = (import <nixpkgs> {}).runCommand "empty" {} "mkdir $out";
   postUnpack = "ln -sv ${./test.c} \"$sourceRoot\"/test.c";
   buildInputs = [
     ocaml findlib gmp ];
