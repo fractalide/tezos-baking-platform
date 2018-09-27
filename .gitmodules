@@ -1,12 +1,3 @@
-[submodule "opam2nix-packages"]
-	path = opam2nix-packages
-	url = git@github.com:obsidiansystems/opam2nix-packages.git
-[submodule "ledger/ledger-app"]
-	path = ledger/ledger-app
-	url = git@github.com:obsidiansystems/ledger-app-tezos
-[submodule "ledger/nanos-secure-sdk"]
-	path = ledger/nanos-secure-sdk
-	url = git@github.com:LedgerHQ/nanos-secure-sdk
 [submodule "tezos-bake-monitor"]
 	path = tezos-bake-monitor
 	url = git@gitlab.com:obsidian.systems/tezos-bake-monitor.git
