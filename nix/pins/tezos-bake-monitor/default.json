@@ -1,7 +1,7 @@
 {
   "url": "https://gitlab.com/obsidian.systems/tezos-bake-monitor.git",
-  "rev": "f8e84070b7ffd76f9b2659e7b2a143238149f984",
-  "date": "2018-09-21T18:26:32+00:00",
-  "sha256": "1rbrac1q6rw0k82ryh24ccp0b9fz8wpx5ppx5asw0pa5l456m9fn",
-  "fetchSubmodules": false
+  "rev": "f348eacc3fc9a755c0d3fb2c340d6b3b9c7c6ec8",
+  "date": "2018-10-05T12:52:36-04:00",
+  "sha256": "191kzzvk7cimj3r4mwrdjs4smy9i4x2nfm6c9c2n49z0l3n0jpaz",
+  "fetchSubmodules": true
 }

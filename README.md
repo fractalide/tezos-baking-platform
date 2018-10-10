@@ -20,7 +20,7 @@ Our Monitoring Software is the first stage of our Baking Software. For instructi
 
 You can connect to Tezos by building it from source or by using docker images. Please see the [Tezos Documentation](http://tezos.gitlab.io/) for instructions.
 
-If you have the [Nix](https://nixos.org/nix/) Package Manager, you can also use Obsidian Systems’ Tezos Baking Platform. Instructions can be found in UsingTezos.md.
+If you have the [Nix](https://nixos.org/nix/) Package Manager, you can also use Obsidian Systems’ Tezos Baking Platform. Instructions can be found in [UsingTezos.md](UsingTezos.md).
 
 # Obtaining Tezos Baking Platform
 
