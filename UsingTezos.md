@@ -1,6 +1,6 @@
 # Using Obsidian’s Tezos Baking Platform
 
-To use Tezos via Obsidian Systems' Baking Platform, start by running the following Nix command. It should take less time to run if you have [set up nix caching](https://gitlab.com/obsidian.systems/tezos-baking-platform#setting-up-nix-caching-recommended). Replace `<network>` with your desired Tezos network, i.e. zeronet, alphanet, betanet.
+To use Tezos via Obsidian Systems' Baking Platform, start by running the following Nix command. It should take less time to run if you have [set up nix caching](https://gitlab.com/obsidian.systems/tezos-baking-platform#setting-up-nix-caching-recommended). Replace `<network>` with your desired Tezos network, i.e. zeronet, alphanet, mainnet.
 
 ```
 $ nix-build -A tezos.<network>.sandbox
