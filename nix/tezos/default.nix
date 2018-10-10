@@ -10,7 +10,9 @@ rec {
   inherit tezos-src;
   inherit tezos-world-path;
 
-  world = callPackage tezos-world-path {};
+  world = let super = callPackage tezos-world-path {}; in lib.makeScope newScope (self: super // {
+    zarith = super.zarith.overrideAttrs (oldAttrs: { postPatch = "patchShebangs ."; });
+  });
 
   kit = world.callPackage ./kit.nix { inherit tezos-src; };
 
