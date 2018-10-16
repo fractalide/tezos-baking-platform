@@ -47,7 +47,7 @@ stdenv.mkDerivation rec {
   version = "1.1";
   name = "${pname}-${version}";
   inherit doCheck;
-  src = (import <nixpkgs> {}).runCommand "empty" {} "mkdir $out";
+  src = (import <nixpkgs> {}).runCommand "empty" { outputHashMode = "recursive"; outputHashAlgo = "sha256"; outputHash = "0sjjj9z1dhilhpc8pq4154czrb79z9cm044jvn75kxcjv6v5l2m5"; } "mkdir $out";
   buildInputs = [
     ocaml findlib pkgconfig ];
   propagatedBuildInputs = [
