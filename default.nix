@@ -4,7 +4,7 @@ nixpkgs.lib.makeScope nixpkgs.newScope (self:
 let
   inherit (self) callPackage;
   pkgs = nixpkgs;
-  inherit (nixpkgs) lib fetchgit haskell dockerTools runCommand;
+  inherit (nixpkgs) lib fetchgit haskell;
 in
 rec {
   pkgs = self;
@@ -31,53 +31,13 @@ rec {
     zeronet = callPackage nix/tezos { tezos-src = fetchThunk tezos/zeronet; tezos-world-path = nix/tezos/zeronet/world; };
     alphanet = callPackage nix/tezos { tezos-src = fetchThunk tezos/alphanet; tezos-world-path = nix/tezos/alphanet/world; };
     betanet = callPackage nix/tezos { tezos-src = fetchThunk tezos/betanet; tezos-world-path = nix/tezos/betanet/world; };
+    mainnet = callPackage nix/tezos { tezos-src = fetchThunk tezos/mainnet; tezos-world-path = nix/tezos/mainnet/world; };
   };
 
-  tezos-bake-monitor = callPackage ./tezos-bake-monitor/tezos-bake-monitor { };
+  obelisk = import ./tezos-bake-monitor/tezos-bake-central/.obelisk/impl {};
+  obeliskNixpkgs = obelisk.reflex-platform.nixpkgs;
+  tezos-loadtest = obeliskNixpkgs.haskellPackages.callCabal2nix "tezos-loadtest" ./tezos-load-testing {};
 
-  tezos-loadtest = callPackage ./tezos-load-testing { };
-
-  tezos-bake-central = (nixpkgs.callPackage ./tezos-bake-monitor/tezos-bake-central/release.nix {}).releaseExe;
-
-  bake-central-docker = let
-    bakeCentralSetupScript = dockerTools.shellScript "dockersetup.sh" ''
-      set -ex
-
-      ${dockerTools.shadowSetup}
-      echo 'nobody:x:99:99:Nobody:/:/sbin/nologin' >> /etc/passwd
-      echo 'nobody:*:17416:0:99999:7:::'           >> /etc/shadow
-      echo 'nobody:x:99:'                          >> /etc/group
-      echo 'nobody:::'                             >> /etc/gshadow
-
-      mkdir -p    /var/run/bake-monitor
-      chown 99:99 /var/run/bake-monitor
-    '';
-    bakeCentralEntrypoint = dockerTools.shellScript "entrypoint.sh" ''
-      set -ex
-
-      mkdir -p /var/run/bake-monitor
-      ln -sft /var/run/bake-monitor '${tezos-bake-central}'/*
-      rm /var/run/bake-monitor/config
-      mkdir -p /var/run/bake-monitor/config
-
-      cd /var/run/bake-monitor
-      exec ./backend "$@"
-    '';
-  in dockerTools.buildImage {
-    name = "tezos-bake-monitor";
-    contents = [ nixpkgs.iana-etc nixpkgs.cacert ];
-    runAsRoot = bakeCentralSetupScript;
-    keepContentsDirlinks = true;
-    config = {
-     Env = [
-        ("PATH=" + builtins.concatStringsSep(":")([
-          "${nixpkgs.stdenv.shellPackage}/bin"
-          "${nixpkgs.coreutils}/bin"
-        ]))
-      ];
-      Expose = 8000;
-      Entrypoint = [bakeCentralEntrypoint];
-      User = "99:99";
-    };
-  };
+  tezos-bake-central = (import ./tezos-bake-monitor {}).exe;
+  bake-central-docker = (import ./tezos-bake-monitor {}).dockerImage;
 })

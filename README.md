@@ -1,9 +1,28 @@
-# Ledger Set Up
+# Overview
 
-These instructions require NixOS, or the [Nix](https://nixos.org/nix/) package
-manager which you can install on any Linux distribution.
+Tezos Baking Platform is Obsidian Systems' collection of Tezos tools and resources for bakers. It requires the [Nix](https://nixos.org/nix/) Package Manager, which you can install on any Linux distribution or MacOS.
 
-## Obtaining the baking platform
+## Ledger Nano S Applications
+
+Obsidian Systems has developed two Tezos applications for the Ledger Nano S hardware wallet.
+* Tezos Wallet - Used for storing, sending, and delegating
+* Tezos Baking - Used for signing blocks, endorsements, and self-delegating
+
+Both are available to download in [Ledger Live](https://www.ledger.com/pages/ledger-live). To obtain them, enable Developer Mode in Settings; you’ll then find them available for download in Ledger Live’s Manager. Downloading these applications from Ledger Manager is not recommended, as those applications are out of date and are not updated.
+
+For instructions on installing Tezos Wallet and Tezos Baking via the command line, visit our [Tezos Ledger Applications Github](https://github.com/obsidiansystems/ledger-app-tezos) repo. You'll also find instructions for their use. If you would like to build the applications yourself, see [BUILDING.md](https://gitlab.com/obsidian.systems/tezos-baking-platform/blob/develop/ledger/BUILDING.md) in the ledger folder. You’ll also find [instructions for testing scripts](https://gitlab.com/obsidian.systems/tezos-baking-platform/blob/develop/ledger/TESTING.md) there.
+
+## Monitoring Software
+
+Our Monitoring Software is the first stage of our Baking Software. For instructions on installation and use, see the [Tezos Bake Monitor](https://gitlab.com/obsidian.systems/tezos-bake-monitor) repo.
+
+## Connecting to Tezos
+
+You can connect to Tezos by building it from source or by using docker images. Please see the [Tezos Documentation](http://tezos.gitlab.io/) for instructions.
+
+If you have the [Nix](https://nixos.org/nix/) Package Manager, you can also use Obsidian Systems’ Tezos Baking Platform. Instructions can be found in [UsingTezos.md](UsingTezos.md).
+
+# Obtaining Tezos Baking Platform
 
 Please clone the
 [Tezos Baking Platform](https://gitlab.com/obsidian.systems/tezos-baking-platform) and
@@ -18,89 +37,48 @@ $ git submodule sync
 $ git submodule update --recursive --init
 ```
 
-## Running a Zeronet Node
+# Setting up Nix Caching (Recommended)
 
-Enter the sandbox shell in the `tezos-baking-platform` working copy's root directory:
+If you have not already, we recommend you setup Nix caching to drastically reduce your build times.
 
-```
-$ nix-shell -A sandbox \
-    --option binary-caches "https://cache.nixos.org/ https://nixcache.reflex-frp.org/" \
-    --option binary-cache-public-keys "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI="
-```
+## NixOS
 
-And this script will run a node on zeronet:
+If you are running NixOS, add this to `/etc/nixos/configuration.nix`:
 
 ```
-$ scripts/zeronet-node.sh
+nix.binaryCaches = [
+  "https://cache.nixos.org/"
+  "https://nixcache.reflex-frp.org"
+];
+
+nix.binaryCachePublicKeys = [ "ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI=" ];
 ```
 
-The node needs to remain running while you run all of the `tezos-client`
-commands.
+## Linux or MacOS
 
-## Running the client
-
-In a new terminal, enter a nix shell that has `tezos-client` available:
+Include these lines in `/etc/nix/nix.conf`. If the nix directory or `nix.conf` file do not yet exist then you will need to create them.
 
 ```
-$ nix-shell \
-    --option binary-caches "https://cache.nixos.org/ https://nixcache.reflex-frp.org/" \
-    --option binary-cache-public-keys "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI=" \
-    --attr client
+substituters = https://cache.nixos.org https://nixcache.reflex-frp.org
+
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI=
 ```
 
-Now jump back to the
-[ledger-app-tezos](https://github.com/obsidiansystems/ledger-app-tezos)
-instructions. All commands there that use `tezos-client` will need to be run in
-this shell.
-
-## Resetting the high water mark
-
-The test network is not so immutable as the real blockchain, and so sometimes
-you might want to reset your Ledger Baking state to allow it go back to a lower
-block height.
-
-Open the Tezos Baking app on the Ledger, and run this:
+If you are using **Linux** then enable sandboxing by adding this line to the `nix.conf` file
 
 ```
-$ tezos-client reset ledger high watermark to 0
+sandbox = true
 ```
 
-## Using Docker for bake monitor
-
-Create docker image (with Nix)
+But if you are using **MacOS** then you will need to disable sandboxing and then restart the nix daemon. Add this line to the `nix.conf` file to disable sandboxing
 
 ```
-$ docker load -i $(nix-build -A bake-central-docker --no-out-link)
-$ docker run -p=127.0.0.1:8000:8000 tezos
+sandbox = false
 ```
 
-# Running the Bake Monitor via Docker
+Use these commands to restart the nix daemon:
 
-1) Build the bake monitor Docker image via `nix`.
-
-[You need nix 2. Check with `nix --version`.]
-
-```shell
-docker load -i $(nix-build -A bake-central-docker --no-out-link)
 ```
-
-2) Create a Docker network to connect multiple containers.
-
-```shell
-docker network create tezos-bake-network
+$ sudo launchctl stop org.nixos.nix-daemon
+$ sudo launchctl start org.nixos.nix-daemon
 ```
-
-3) Start a Postgres database instance in the network.
-
-```shell
-docker pull postgres
-docker run --name bake-monitor-db --detach --network tezos-bake-network -e POSTGRES_PASSWORD=secret postgres
-```
-
-4) Start the bake monitor Docker container in the same network and connect it to the appropriate database.
-
-```shell
-docker run --rm -p=8000:8000 --network tezos-bake-network tezos-bake-monitor --pg-connection='host=bake-monitor-db dbname=postgres user=postgres password=secret'
-```
-
-5) Visit the bake monitor at `http://localhost:8000`.
