@@ -42,7 +42,7 @@ sleep 5
 attempt tezos-sandbox-client.sh set delegate for original to my-ledger
 echo "Switch back to baking app to confirm that this will reject, then use wallet app to sign"
 sleep 5
-attempt tezos-sandbox-client withdraw delegate from my-ledger
+attempt tezos-sandbox-client.sh withdraw delegate from my-ledger
 echo "Switch back to baking app to confirm that this will reject, then use wallet app to sign"
 attempt tezos-sandbox-client.sh set delegate for my-ledger to my-ledger --fee 1
 
