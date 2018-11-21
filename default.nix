@@ -14,8 +14,8 @@ rec {
       if super ? versioning then super.versioning
       else import ./nix/lib/versioning { lib = self; };
   });
-  stdenv = nixpkgs.stdenv // {
-    lib = nixpkgs.stdenv.lib.extend (self: super: {
+  stdenv = nixpkgs.gccStdenv // {
+    lib = nixpkgs.gccStdenv.lib.extend (self: super: {
       versioning =
         if super ? versioning then super.versioning
         else lib.versioning;
