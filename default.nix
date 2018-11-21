@@ -14,6 +14,13 @@ rec {
       if super ? versioning then super.versioning
       else import ./nix/lib/versioning { lib = self; };
   });
+  stdenv = nixpkgs.stdenv // {
+    lib = nixpkgs.stdenv.lib.extend (self: super: {
+      versioning =
+        if super ? versioning then super.versioning
+        else lib.versioning;
+    });
+  };
 
   combineOverrides = old: new: (old // new) // {
     overrides = lib.composeExtensions old.overrides new.overrides;
