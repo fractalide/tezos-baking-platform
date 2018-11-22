@@ -5,6 +5,7 @@ let
   inherit (self) callPackage;
   pkgs = nixpkgs;
   inherit (nixpkgs) lib fetchgit haskell;
+  tezos-bake-monitor-src = import ./nix/pins/tezos-bake-monitor;
 in
 rec {
   pkgs = self;
@@ -34,10 +35,10 @@ rec {
     mainnet = callPackage nix/tezos { tezos-src = fetchThunk tezos/mainnet; tezos-world-path = nix/tezos/mainnet/world; };
   };
 
-  obelisk = import ./tezos-bake-monitor/tezos-bake-central/.obelisk/impl {};
+  obelisk = import (tezos-bake-monitor-src + "/tezos-bake-monitor/tezos-bake-central/.obelisk/impl") {};
   obeliskNixpkgs = obelisk.reflex-platform.nixpkgs;
-  tezos-loadtest = obeliskNixpkgs.haskellPackages.callCabal2nix "tezos-loadtest" ./tezos-load-testing {};
+  tezos-loadtest = obeliskNixpkgs.haskellPackages.callCabal2nix "tezos-loadtest" (import ./nix/pins/tezos-load-testing) {};
 
-  tezos-bake-central = (import ./tezos-bake-monitor {}).exe;
-  bake-central-docker = (import ./tezos-bake-monitor {}).dockerImage;
+  tezos-bake-central = (import tezos-bake-monitor-src {}).exe;
+  bake-central-docker = (import tezos-bake-monitor-src {}).dockerImage;
 })
