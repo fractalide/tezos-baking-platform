@@ -4,7 +4,7 @@ nixpkgs.lib.makeScope nixpkgs.newScope (self:
 let
   inherit (self) callPackage;
   pkgs = nixpkgs;
-  inherit (nixpkgs) lib fetchgit haskell dockerTools runCommand;
+  inherit (nixpkgs) lib fetchgit haskell;
   tezos-bake-monitor-src = import ./nix/pins/tezos-bake-monitor;
 in
 rec {
