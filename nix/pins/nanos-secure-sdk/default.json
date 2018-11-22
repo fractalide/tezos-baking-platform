@@ -1,7 +1,7 @@
 {
   "url": "https://github.com/LedgerHQ/nanos-secure-sdk.git",
-  "rev": "0be513c4bd85ad03f446da25a35425f480ccdc3f",
-  "date": "2018-04-17T10:02:24+02:00",
-  "sha256": "01ddqqry67s4mnpvc8gqfczmv6lb0kak69xlqc55iaa3l2va02vn",
+  "rev": "0030cdffef330ed116268e8a992d06637b44432b",
+  "date": "2018-08-17T13:44:53+02:00",
+  "sha256": "0j9vkjsa51zlzsi4qww4gcdv70xwpca62lhgx99xyja89cq6dicn",
   "fetchSubmodules": false
 }

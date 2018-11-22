@@ -16,7 +16,7 @@ cd "$(dirname "$0")"
     if [ "${1:-X}" = "all" ]; then
         cat
     else
-        grep -e Error -e error -e '^src/.*warning:' -e app.elf -e filename -e Building || :
+        grep -e Error -e error -e '^src/.*warning:' -e app.elf -e filename -e Building -e "Version-Tag" || :
     fi
 }
 tar czf release.tar.gz wallet.hex baking.hex

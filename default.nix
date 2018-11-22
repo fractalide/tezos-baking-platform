@@ -47,7 +47,7 @@ rec {
     mainnet = callPackage nix/tezos { tezos-src = fetchThunk tezos/mainnet; tezos-world-path = nix/tezos/mainnet/world; };
   };
 
-  obelisk = import "${tezos-bake-monitor-src}/tezos-bake-central/.obelisk/impl" {};
+  obelisk = import (tezos-bake-monitor-src + "/tezos-bake-central/.obelisk/impl") {};
   obeliskNixpkgs = obelisk.reflex-platform.nixpkgs;
   tezos-loadtest = obeliskNixpkgs.haskellPackages.callCabal2nix "tezos-loadtest" (import ./nix/pins/tezos-load-testing) {};
 
