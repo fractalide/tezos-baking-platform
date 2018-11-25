@@ -1,10 +1,17 @@
-{ pkgs ? import ../nix/nixpkgs.nix {} }:
+{ pkgs ? import ../nix/nixpkgs.nix {}
+, curl ? pkgs.curl
+, lib ? pkgs.lib
+, requireFile ? pkgs.requireFile
+, runCommand ? pkgs.runCommand
+, writeScript ? pkgs.writeScript
+}:
+
 let
-  requireCurl = { url, sha256 }: pkgs.lib.overrideDerivation
-    (pkgs.requireFile { inherit url sha256; })
+  requireCurl = { url, sha256 }: lib.overrideDerivation
+    (requireFile { inherit url sha256; })
     (attrs: {
-       builder = pkgs.writeScript "get-the-thing" ''
-         ${pkgs.curl}/bin/curl --url '${url}' -o $out
+       builder = writeScript "get-the-thing" ''
+         ${curl}/bin/curl --url '${url}' -o $out
        '';
      });
   clang = requireCurl {
@@ -15,7 +22,7 @@ let
     url = https://launchpadlibrarian.net/251687888/gcc-arm-none-eabi-5_3-2016q1-20160330-linux.tar.bz2;
     sha256 = "08x2sv2mhx3l3adw8kgcvmrs10qav99al410wpl18w19yfq50y11";
   };
-in pkgs.runCommand "bolos-env" {} ''
+in runCommand "bolos-env" {} ''
   mkdir $out
   mkdir $out/clang-arm-fropi
   tar xavf ${clang} --strip-components=1 -C $out/clang-arm-fropi
