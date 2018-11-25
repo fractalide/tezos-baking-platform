@@ -10,5 +10,4 @@ let
                             (builtins.attrNames pkgs.tezos));
 
 in mkJobs (import ./nix/nixpkgs.nix {}) // {
-  latest-nixpkgs = mkJobs (import <nixpkgs> {});
 }
