@@ -5,7 +5,7 @@ let
 	# For development, set OPAM2NIX_DEVEL to your local
 	# opam2nix repo path
 	devRepo = builtins.getEnv "OPAM2NIX_DEVEL";
-	src = ./opam2nix-packages;
+	src = import ./opam2nix-packages/fetch.nix;
 	opam2nix = fetchgit 	{
 		"url" = "https://github.com/obsidiansystems/opam2nix.git";
 		"fetchSubmodules" = false;
