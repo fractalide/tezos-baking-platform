@@ -1,10 +1,6 @@
 { pkgs ? import ../nix/nixpkgs.nix {}
-, curl ? pkgs.curl
 , fetchurl ? pkgs.fetchurl
-, lib ? pkgs.lib
-, requireFile ? pkgs.requireFile
 , runCommand ? pkgs.runCommand
-, writeScript ? pkgs.writeScript
 }:
 
 let
@@ -19,7 +15,7 @@ let
 in runCommand "bolos-env" {} ''
   mkdir $out
   mkdir $out/clang-arm-fropi
-  tar xavf ${clang} --strip-components=1 -C $out/clang-arm-fropi
+  tar xaf ${clang} --strip-components=1 -C $out/clang-arm-fropi
   mkdir $out/gcc-arm-none-eabi-5_3-2016q1
-  tar xavf ${gcc} --strip-components=1 -C $out/gcc-arm-none-eabi-5_3-2016q1
+  tar xaf ${gcc} --strip-components=1 -C $out/gcc-arm-none-eabi-5_3-2016q1
 ''
