@@ -1,0 +1,7 @@
+{
+  "url": "https://github.com/obsidiansystems/opam2nix",
+  "rev": "42a42bb7a90105c394e72f34ff721a7b73908dc6",
+  "date": "2018-06-19T13:36:02-04:00",
+  "sha256": "05j6nbs8vf0m4mpinp79yryyzdlkhf16jdbr8kkhl62m9jc1nwl3",
+  "fetchSubmodules": false
+}
