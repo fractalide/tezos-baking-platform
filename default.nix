@@ -26,11 +26,11 @@ rec {
 
   fauxpam = callPackage nix/fauxpam.nix {};
 
-  tezos = {
+  tezos = rec {
     master = callPackage nix/tezos { tezos-src = fetchThunk tezos/master; tezos-world-path = nix/tezos/master/world; };
     zeronet = callPackage nix/tezos { tezos-src = fetchThunk tezos/zeronet; tezos-world-path = nix/tezos/zeronet/world; };
     alphanet = callPackage nix/tezos { tezos-src = fetchThunk tezos/alphanet; tezos-world-path = nix/tezos/alphanet/world; };
-    betanet = callPackage nix/tezos { tezos-src = fetchThunk tezos/betanet; tezos-world-path = nix/tezos/betanet/world; };
+    betanet = builtins.trace "DEPRECATED betanet: 'betanet' is now an alias for 'mainnet'. Use 'mainnet' instead." mainnet;
     mainnet = callPackage nix/tezos { tezos-src = fetchThunk tezos/mainnet; tezos-world-path = nix/tezos/mainnet/world; };
   };
 
