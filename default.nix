@@ -4,10 +4,23 @@ nixpkgs.lib.makeScope nixpkgs.newScope (self:
 let
   inherit (self) callPackage;
   pkgs = nixpkgs;
-  inherit (nixpkgs) lib fetchgit haskell;
+  inherit (nixpkgs) fetchgit haskell;
+  tezos-bake-monitor-src = import ./nix/pins/tezos-bake-monitor;
 in
 rec {
   pkgs = self;
+  lib = nixpkgs.lib.extend (self: super: {
+    versioning =
+      if super ? versioning then super.versioning
+      else import ./nix/lib/versioning { lib = self; };
+  });
+  stdenv = nixpkgs.gccStdenv // {
+    lib = nixpkgs.gccStdenv.lib.extend (self: super: {
+      versioning =
+        if super ? versioning then super.versioning
+        else lib.versioning;
+    });
+  };
 
   combineOverrides = old: new: (old // new) // {
     overrides = lib.composeExtensions old.overrides new.overrides;
@@ -34,7 +47,7 @@ rec {
     mainnet = callPackage nix/tezos { tezos-src = fetchThunk tezos/mainnet; tezos-world-path = nix/tezos/mainnet/world; };
   };
 
-  obelisk = import ./tezos-bake-monitor/tezos-bake-central/.obelisk/impl {};
+  inherit (import ./tezos-bake-monitor {}) obelisk;
   obeliskNixpkgs = obelisk.reflex-platform.nixpkgs;
   tezos-loadtest = obeliskNixpkgs.haskellPackages.callCabal2nix "tezos-loadtest" ./tezos-load-testing {};
 
