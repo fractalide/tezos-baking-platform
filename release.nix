@@ -7,7 +7,7 @@ let
     ledger-baker = pkgs.callPackage ledger/build.nix { bakingApp = true; };
     ledger-wallet = pkgs.callPackage ledger/build.nix { bakingApp = false; };
   } // lib.listToAttrs (map (name: lib.nameValuePair name pkgs.tezos.${name}.kit)
-                            (builtins.attrNames pkgs.tezos));
+                            (builtins.attrNames (removeAttrs pkgs.tezos ["betanet"])));
 
 in mkJobs (import ./nix/nixpkgs.nix {}) // {
   latest-nixpkgs = mkJobs (import <nixpkgs> {});
