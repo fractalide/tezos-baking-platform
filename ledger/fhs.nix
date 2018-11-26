@@ -14,7 +14,7 @@ buildFHSUserEnv {
     xorg.libXScrnSaver xorg.libXcomposite xorg.libXcursor xorg.libXdamage
     xorg.libXext xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender
     xorg.libXtst xorg.libxcb xorg.xcbutilkeysyms zlib zsh
-    gnumake libtinfo5 glibc_multi.dev
+    gnumake libtinfo5 glibc_multi.dev (python2.withPackages (ps: [ps.pillow]))
   ];
   runScript = "bash"; # "$SHELL";
 }

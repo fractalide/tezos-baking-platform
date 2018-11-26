@@ -1,7 +1,0 @@
-{
-  "url": "https://gitlab.com/tezos/tezos.git",
-  "rev": "9ce0018506e75c692dad3f9f74ce58245b7c6a7f",
-  "sha256": "12vkfxdmhfwy4q1y9xbg20a41mx45jj07r6kcrpd7q4kzcn5cw3g",
-  "fetchSubmodules": false,
-  "branch": "vb/ledger-100"
-}
